@@ -213,6 +213,26 @@ void getTag(Data * data,char * tagGet){
     }
 }
 
+void stringRemoveNonAlphaNum(char *str)
+{
+    unsigned long i = 0;
+    unsigned long j = 0;
+    char c;
+
+    while ((c = str[i++]) != '\0')
+    {
+        if (isalnum(c))
+        {
+            str[j++] = c;
+        }
+    }
+    str[j] = '\0';
+
+}
+
+
+
+
 /*----------------------------------------------------------------------------*/
 /*
  * Description: get the tag from NOT begginig of the line
@@ -225,9 +245,13 @@ void getTagOperand(Data * data, char * tagGet){
      char * c = tag;
 
     sscanf(data->line, " %s", c);
-    printf("tagGet: %s \n", tag);
-     /*
+     /* printf("tagGet: %s \n", tag);*/
+
+    stringRemoveNonAlphaNum(c);
+    /*
+
      if (checkLetters(*c)== 0){
+         tagGet=NULL;
         return;
     }
     
@@ -241,9 +265,11 @@ void getTagOperand(Data * data, char * tagGet){
 
     strcpy(tag,tagGet);
     strcat(tagGet,"\n");
-    */
+
     
 
+    */
     strcpy(tagGet,tag);
+
     
 }

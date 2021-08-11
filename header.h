@@ -1,5 +1,5 @@
 #ifndef HEADER_H
-#define HEADE_H
+#define HEADER_H
 
 
 /*-------------------------------------------*/

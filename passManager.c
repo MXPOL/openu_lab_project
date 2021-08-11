@@ -50,16 +50,6 @@ void initializeData(Data *data) {
   data->enc = 0;
   data->wc = 0;
 
-  /* directive */
-  data->db_c = 0;
-  data->dh_c = 0;
-  data->dw_c = 0;
-
-  data->dbArr = NULL;
-  data->dhArr = NULL;
-  data->dwArr = NULL;
-
-
   /*
   data->instArr = NULL;
   data->wordArr = NULL;
