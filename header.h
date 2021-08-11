@@ -40,9 +40,44 @@
 /* secondPassCommandManager function declarations*/
 /* output manager */
 
+/*  passManager function declarations*/
+int passManager(FILE *file, char *);
+void setDataFree(Data *data);
+void initializeData(Data *data);
+
+/* firstPassManager function declarations*/
+int firstPassManager(Data * data,FILE *file);
+int lineHandler(Data * data, FILE *file);
+int lineLengthCheck(Data * data, FILE *file);
+int tagDupCheck(Data *data, char *tag);
+void addTag(Data * data, char * tag, int dirAddress,int kind);
 
 
+/* commmonFunc declarations*/
+int lineCommentCheck(Data * data);
+void getTag(Data * data,char * tagGet);
+int lineEmptyCheck(Data * data);
+void eatLine(FILE * fp);
+void eatSpace(Data * data);
+void substring(char* stringTo,char* stringFrom,int length);
+int checkLetterOrNumber(char c);
+int checkLetters(char c);
+int checkUpperCase(char c);
+int checkInLimit(char c,int startLimit,int length);
+char* getCharPtrBeyondSpace(char* pString);
+int isEndOfLine(char* pStr);
+void getTagOperand(Data * data, char * tagGet);
 
+/* directivesManager function declarations */
+int directivesManager(Data * data, char * tag);
+int dataDirectiveHandler(Data * data, char * tag,int kind);
+void addDirective(Data * data, int directive);
+void addDataDirective(Data * data, int directive,int *kind);
+int stringDirectiveHandler(Data * data, char * tag);
+int entryDirectiveHandler(Data * data, char * tag);
+void addEntry(Data * data, char * tag);
+int externDirectiveHandler(Data * data, char * tag);
+void addExtern(Data * data, char * tag);
 
 
 #endif

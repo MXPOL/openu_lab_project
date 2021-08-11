@@ -7,7 +7,13 @@
 enum boolean {FALSE, TRUE};
 
 /*Maximum line buffer size*/
-#define MAX_LINE 80
+#define MAX_LINE_LEN 80
+
+/*Maximum label buffer length*/
+#define MAX_LABEL_LENGTH 31
+
+/* maximum length of a tag is 31 */
+#define MAX_TAG_LEN 31
 
 /*Maximum filename size*/
 #define MAX_FILENAME 50
@@ -18,13 +24,23 @@ enum boolean {FALSE, TRUE};
 
 /*Directive string constants, to be compared with input*/
 
-#define STR_DIRECTIVE_DB ".db"
-#define STR_DIRECTIVE_DH ".dh"
-#define STR_DIRECTIVE_DW ".dw"
+#define MAX_DIRECTIVE_LEN 6
+/* kind :
+ 0 - db
+ 1 - dh
+ 2 - dw
+ 3 - asciz
+*/
 
-#define STR_DIRECTIVE_ASCIZ ".asciz"
-#define STR_DIRECTIVE_ENTRY ".entry"
-#define STR_DIRECTIVE_EXTERN ".extern"
+enum DIRECTIVE_KIND{DB, DH, DW, ASCIZ};
+
+#define STR_DIRECTIVE_DB "db"
+#define STR_DIRECTIVE_DH "dh"
+#define STR_DIRECTIVE_DW "dw"
+
+#define STR_DIRECTIVE_ASCIZ "asciz"
+#define STR_DIRECTIVE_ENTRY "entry"
+#define STR_DIRECTIVE_EXTERN "extern"
 
 /*Maximum and minimum values that can be stored in 16 bits*/
 #define MAX_NUM_IMMEDIATE 32767

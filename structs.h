@@ -1,5 +1,6 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
+#include "defines.h"
 /*This file contains */
 
 /*definition of first word type*/
@@ -42,5 +43,59 @@ typedef struct{
    unsigned int reg : 1;
    unsigned int address : 25;
 } InstructionJ;
+
+/*----------------------------------------------------------------------------*/
+/*Label/Tag  structures */
+/*----------------------------------------------------------------------------*/
+
+typedef struct{
+    char name[MAX_TAG_LEN];
+    int address;
+    int external;
+    int command;
+    int kind;
+} Tag;
+
+typedef struct{
+    char name[MAX_TAG_LEN];
+} Entry;
+typedef struct{
+    char name[MAX_TAG_LEN];
+} Extern;
+
+typedef struct{
+    char * line;
+    /* tag counter */
+    int tc;
+    /* line counter */
+    int lc;
+    /* instruction counter */
+    int ic;
+    /* extern counter */
+    int exc;
+    /* entry counter */
+    int enc;
+    /* extra words counter */
+    int wc;
+
+    Tag * tagArr;
+
+    /* Remove In The End*/
+    int * directiveArr;
+    int dc;
+
+    Extern * externArr;
+    Entry * entryArr;
+    /*
+    Instruction * instArr;
+    ExtraWord * wordArr;
+    */
+
+
+     /* if there's an error, no need for a second pass */
+    int containError;
+} Data;
+
+
 
 #endif
