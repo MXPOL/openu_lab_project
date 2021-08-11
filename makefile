@@ -18,4 +18,4 @@ directivesManager.o: directivesManager.c
 	gcc -m32 -c -ansi -Wall -pedantic directivesManager.c -o directivesManager.o
 
 firstPassCommandsManager.o: firstPassCommandsManager.c
-	gcc -c -ansi -Wall -pedantic firstPassCommandsManager.c -o firstPassCommandsManager.o
+	gcc  -m32 -c -ansi -Wall -pedantic firstPassCommandsManager.c -o firstPassCommandsManager.o
