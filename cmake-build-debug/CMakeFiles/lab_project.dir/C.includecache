@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/maximp/CLionProjects/lab_project/defines.h
+
+/Users/maximp/CLionProjects/lab_project/header.h
+string.h
+-
+stdio.h
+-
+stdlib.h
+-
+ctype.h
+-
+structs.h
+/Users/maximp/CLionProjects/lab_project/structs.h
+defines.h
+/Users/maximp/CLionProjects/lab_project/defines.h
+
+/Users/maximp/CLionProjects/lab_project/main.c
+header.h
+/Users/maximp/CLionProjects/lab_project/header.h
+
+/Users/maximp/CLionProjects/lab_project/structs.h
+defines.h
+/Users/maximp/CLionProjects/lab_project/defines.h
+
