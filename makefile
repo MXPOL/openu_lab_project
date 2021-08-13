@@ -1,6 +1,5 @@
-maman14: main.o passManager.o firstPass.o commonFuncs.o directivesManager.o firstPassCommandsManager.o firstPassCommandsManager.o
-	gcc -m32  -Wall -ansi -pedantic main.o commonFuncs.o passManager.o firstPass.o directivesManager.o -o maman14
-
+maman14: main.o passManager.o firstPass.o commonFuncs.o directivesManager.o firstPassCommandsManager.o
+	gcc -m32  -Wall -ansi -pedantic main.o commonFuncs.o passManager.o firstPass.o directivesManager.o firstPassCommandsManager.o -o maman14
 
 main.o:	main.c
 	gcc -m32 -c -Wall -ansi -pedantic main.c -o main.o
