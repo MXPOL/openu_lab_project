@@ -1,6 +1,3 @@
-//
-// Created by Maxim Polski on 13/08/2021.
-//
 
 #ifndef LAB_PROJECT_STRUCTS_H
 #define LAB_PROJECT_STRUCTS_H
@@ -113,6 +110,4 @@ typedef struct{
 } Data;
 
 
-
-
-#endif //LAB_PROJECT_STRUCTS_H
+#endif

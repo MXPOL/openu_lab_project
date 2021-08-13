@@ -1,7 +1,3 @@
-//
-// Created by Maxim Polski on 13/08/2021.
-//
-
 #ifndef LAB_PROJECT_HEADER_H
 #define LAB_PROJECT_HEADER_H
 
@@ -102,4 +98,4 @@ int isTagOperand( char * operand);
 #endif
 
 
-#endif //LAB_PROJECT_HEADER_H
+#endif

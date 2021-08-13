@@ -1,6 +1,3 @@
-//
-// Created by Maxim Polski on 13/08/2021.
-//
 
 #ifndef LAB_PROJECT_DEFINES_H
 #define LAB_PROJECT_DEFINES_H
@@ -123,4 +120,4 @@ enum DIRECTIVE_KIND{DB, DH, DW, ASCIZ};
 
 
 
-#endif //LAB_PROJECT_DEFINES_H
+#endif
