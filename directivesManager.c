@@ -15,35 +15,53 @@
  * Output:		1 if letter or number, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
-int directivesManager(Data * data, char * tag){
-    char s[MAX_DIRECTIVE_LEN];
+int directivesManager(Data *data, char *tag, int whatPass) {
+
+    char s[MAX_DIRECTIVE_LEN + 1];
+    /* skip the dot */
     data->line++;
-    sscanf((data->line),"%s",s);
-    data->line+=strlen(s)+1;
+    /* get the directive */
+    sscanf((data->line), "%s", s);
+    data->line += strlen(s) + 1;
     eatSpace(data);
 
-    if( strcmp(s,STR_DIRECTIVE_DB)==0){
-        return dataDirectiveHandler(data,tag,DB);
-    }
-    if (strcmp(s,STR_DIRECTIVE_DH)==0){
-        return dataDirectiveHandler(data,tag,DH);
-    }
-    if(strcmp(s,STR_DIRECTIVE_DW)==0 ){
-        return dataDirectiveHandler(data,tag,DW);
-    }
-    if(strcmp(s,STR_DIRECTIVE_ASCIZ)==0){
-        return stringDirectiveHandler(data,tag);
-    }
-    if(strcmp(s,STR_DIRECTIVE_ENTRY)==0){
-        return entryDirectiveHandler(data,tag);
-    }
-    if(strcmp(s,STR_DIRECTIVE_EXTERN)==0){
-        return externDirectiveHandler(data,tag);
-    }
-    printf("[Error] on line %d: %s is not a valid directive\n",data->lc, s);
-    data->containError=TRUE;
+    if (whatPass == FIRST_PASS){
+        if ( strcmp(s, STR_DIRECTIVE_DB) == 0) {
+            return dataDirectiveHandler(data, tag, DATA_DB);
+        }
+        if (strcmp(s, STR_DIRECTIVE_DH) == 0) {
+            return dataDirectiveHandler(data, tag, DATA_DH);
+        }
+        if (strcmp(s, STR_DIRECTIVE_DW) == 0) {
+            return dataDirectiveHandler(data, tag, DATA_DW);
+        }
+        if (strcmp(s, STR_DIRECTIVE_ASCIZ) == 0) {
+            return stringDirectiveHandler(data, tag);
+        }
+        if (strcmp(s, STR_DIRECTIVE_ENTRY) == 0) {
+            return entryDirectiveHandler(data, tag);
+        }
 
-    return 0;
+        if (strcmp(s, STR_DIRECTIVE_EXTERN) == 0) {
+            return externDirectiveHandler(data, tag);
+        }
+
+        printf("[Error] on line %d: %s is not a valid directive\n", data->lc, s);
+        data->containError = TRUE;
+
+        return 0;
+
+    }
+
+    if (whatPass == SECOND_PASS) {
+        if (strcmp(s, STR_DIRECTIVE_ENTRY) == 0) {
+            return entryDirectiveHandlerSecondPass(data);
+        }
+
+        return 1;
+    }
+
+
 }
 
 /*----------------------------------------------------------------------------*/
@@ -53,60 +71,69 @@ int directivesManager(Data * data, char * tag){
  * Output:		1 if letter or number, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
-int dataDirectiveHandler(Data * data, char * tag, int kind){
+int dataDirectiveHandler(Data *data, char *tag, int kind) {
 
-    int i=0;
+    int i = 0;
     int num;
-    int dcounter=0;
+    int dcounter = 0;
     int numberArray[80];
+    int count;
+    int tagNumber = -1;
 
     /* state 1 means check number, state 2 means check comma, state 0 means exit */
-    int state =1;
-    /* check for an empty data directive */
+    int state = GET_NUMBER;
 
-    if(*(data->line)== '\n' || *(data->line)==EOF){
+    /* check for an empty data directive */
+    if (*(data->line) == '\n' || *(data->line) == EOF) {
         printf("[Error] on line %d: malformed data directive - empty directive parameters \n", data->lc);
-        data->containError=TRUE;
+        data->containError = TRUE;
         return 0;
     }
-    while(state != EXIT){
+
+    /* get the numbers */
+    while (state != EXIT) {
         eatSpace(data);
-        if(state==GET_NUMBER){
-            if (sscanf(data->line, "%d", &num) == 0) {
+        if (state == GET_NUMBER) {
+            if (sscanf(data->line, "%d", &num) == 0  || *(data->line) == '\n' || *(data->line) == EOF ) {
                 printf("[Error] on line %d:- malformed data directive - missing number \n", data->lc);
-                data->containError=TRUE;
+                data->containError = TRUE;
                 return 0;
             }
-            numberArray[dcounter]= num;
+            numberArray[dcounter] = num;
             dcounter++;
             /* get the line location pointer (line_loc) beyond what sscanf took in */
-            if (*(data->line) == '-' || *(data->line) == '+'){
+            if (*(data->line) == '-' || *(data->line) == '+') {
                 data->line++;
             }
-            while (isdigit(*(data->line))){
+            while (isdigit(*(data->line))) {
                 data->line++;
             }
-            state=GET_COMMA;
-        }else if(state==GET_COMMA){
+            state = GET_COMMA;
+        } else if (state == GET_COMMA) {
             eatSpace(data);
-            if (*(data->line) != ',' && *(data->line) != '\n' && *(data->line) !=EOF) {
-                printf("[Error] on line %d: - malformed data directive - unidentified characters in addition to numeric parameters\n", data->lc);
-                data->containError=TRUE;
+            if (*(data->line) != ',' && *(data->line) != '\n' && *(data->line) != EOF) {
+                printf("[Error] on line %d: - malformed data directive - unidentified characters in addition to numeric parameters\n",
+                       data->lc);
+                data->containError = TRUE;
                 return 0;
             }
             if (*(data->line) == '\n' || *(data->line) == EOF) {
-                state=EXIT;
-            }else{
-                state=GET_NUMBER;;
+                state = EXIT;
+            } else {
+                state = GET_NUMBER;;
                 data->line++;
             }
         }
     }
-    if( tag != NULL && *tag != '\0'){
-        addTag(data,tag, data->dc,kind);
+    /* if there are tag, add this line to the symbol table */
+    if (tag != NULL && *tag != '\0') {
+        tagNumber = data -> tc;
+        addTag(data, tag, data->dc, kind);
     }
-    for(i=0;i<dcounter;i++){
-        addDirective(data, numberArray[i]);
+    /* add the numbers to Directive table */
+    for (i = 0; i < dcounter; i++) {
+       /* addDirective(data, numberArray[i],kind);*/
+        addDirective2(data, numberArray[i],tagNumber,kind);
     }
 
     return 1;
@@ -119,9 +146,27 @@ int dataDirectiveHandler(Data * data, char * tag, int kind){
  * Output:		nothing
  */
 /*----------------------------------------------------------------------------*/
-void addDirective(Data * data, int directive){
-    data->directiveArr = realloc(data->directiveArr, sizeof(int)*(data->dc+1));
-    data->directiveArr[data->dc]=directive;
+void addDirective(Data *data, int directive, int kind) {
+    data->directiveArr = realloc(data->directiveArr, sizeof(int) * (data->dc + 1));
+    data->directiveArrIndex = realloc(data->directiveArrIndex, sizeof(int) * (data->dc + 1));
+    data->directiveArr[data->dc] = directive;
+    data->directiveArrIndex[data->dc] = kind;
+    data->dc++;
+}
+
+/*----------------------------------------------------------------------------*/
+/*
+ * Description: adds a directive to array
+ * Input:       Data struct, directive address
+ * Output:		nothing
+ */
+/*----------------------------------------------------------------------------*/
+void addDirective2(Data *data, int directive,int tagNumber, int kind) {
+    data->directiveArr2 = realloc(data->directiveArr2, sizeof(Directive) * (data->dc + 1));
+    data->directiveArr2[data->dc].data = directive;
+    data->directiveArr2[data->dc].tagNumber = tagNumber;
+    data->directiveArr2[data->dc].kind = kind;
+    data->directiveArr2[data->dc].icf = data->dc;
     data->dc++;
 }
 
@@ -132,53 +177,56 @@ void addDirective(Data * data, int directive){
  * Output:		1 if letter or number, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
-int stringDirectiveHandler(Data * data, char * tag){
-    int i=0;
-    int counter=0;
+int stringDirectiveHandler(Data *data, char *tag) {
+    int i;
+    int counter = 0;
     char charArray[80];
+    int tagNumber;
 
-    if(*(data->line) =='\n' || *(data->line)==EOF){
-        printf("[Error] on line %d: empty directive\n",data->lc);
-        data->containError=TRUE;
+    if (*(data->line) == '\n' || *(data->line) == EOF) {
+        printf("[Error] on line %d: empty directive\n", data->lc);
+        data->containError = TRUE;
         return 0;
     }
     /* check for beggining character of the string (") */
-    if(*(data->line)=='"'){
+    if (*(data->line) == '"') {
         /* put all the characters of the string into the directives table*/
         data->line++;
-        while(*(data->line)!='"' && *(data->line)!='\n' && *(data->line)!=EOF){
-            charArray[counter]=*(data->line);
+        while (*(data->line) != '"' && *(data->line) != '\n' && *(data->line) != EOF) {
+            charArray[counter] = *(data->line);
             counter++;
             data->line++;
         }
         /* if the last character of the string is not a closing quotation mark - it's an invalid string*/
-        if(*(data->line)!='"'){
-            printf("[Error] on line %d:malformed string directive - no ending quotation mark in string\n",data->lc);
-            data->containError=TRUE;
+        if (*(data->line) != '"') {
+            printf("[Error] on line %d:malformed string directive - no ending quotation mark in string\n", data->lc);
+            data->containError = TRUE;
             return 0;
         }
         data->line++;
         /* check for extra characters after the string ending (it's not a valid string directive that way) */
         eatSpace(data);
         if ((*(data->line) != '\n') && (*(data->line) != EOF)) {
-            printf("[Error] on line %d: malformed string directive - extra characters after string ending\n",data->lc);
-            data->containError=TRUE;
+            printf("[Error] on line %d: malformed string directive - extra characters after string ending\n", data->lc);
+            data->containError = TRUE;
             return 0;
         }
         /* if the string directive contains no string - it's an invalid directive */
-    }else{
-        printf("[Error] on line %d: malformed string directive - no leading quotation mark in string\n",data->lc);
-        data->containError=TRUE;
+    } else {
+        printf("[Error] on line %d: malformed string directive - no leading quotation mark in string\n", data->lc);
+        data->containError = TRUE;
         return 0;
     }
 
-    if( tag != NULL && *tag != '\0'){
-        addTag(data,tag, data->dc,ASCIZ);
+    if (tag != NULL && *tag != '\0') {
+        tagNumber = data -> tc;
+        addTag(data, tag, data->dc, DATA_ASCIZ);
     }
-    for(i=0;i<counter;i++){
-        addDirective(data,charArray[i]);
+    for (i = 0; i < counter; i++) {
+        addDirective2(data, charArray[i],tagNumber,DATA_ASCIZ);
     }
-    addDirective(data,0);
+    /*addDirective(data, 0,DATA_ASCIZ);*/
+    addDirective2(data, 0,tagNumber,DATA_ASCIZ);
     return 1;
 }
 
@@ -190,47 +238,47 @@ int stringDirectiveHandler(Data * data, char * tag){
  * Output:		1 if letter or number, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
-int entryDirectiveHandler(Data * data, char * tag){
+int entryDirectiveHandler(Data *data, char *tag) {
     char tagName[MAX_TAG_LEN];
     int i;
-    tagName[0]=0;
-    if(*tag != '\0'){
-        printf("[Error] on line %d: a .entry directive can't start with a tag\n",data->lc);
-        data->containError=TRUE;
+    tagName[0] = 0;
+    if (*tag != '\0') {
+        printf("[Warning] on line %d: a .entry directive started with a tag\n", data->lc);
+//        data->containError = TRUE;
+//        return 0;
+    }
+    if (*(data->line) == '\n' || *(data->line) == EOF) {
+        printf("[Error] on line %d: empty directive\n", data->lc);
+        data->containError = TRUE;
         return 0;
     }
-    if(*(data->line) =='\n' || *(data->line)==EOF){
-        printf("[Error] on line %d: empty directive\n",data->lc);
-        data->containError=TRUE;
+    getTagOperand(data, tagName);
+    if (tagName == NULL) {
+        printf("[Error] on line %d: malformed .entry directive\n", data->lc);
+        data->containError = TRUE;
         return 0;
     }
-    getTagOperand(data,tagName);
-    if(tagName==NULL){
-        printf("[Error] on line %d: malformed .entry directive\n",data->lc);
-        data->containError=TRUE;
-        return 0;
-    }
-    for(i=0;i<=(data->enc);i++){
-        if (data->entryArr != NULL){
-            if (strcmp(tagName,"\0") != 0){
-                if(strcmp(data->entryArr[i].name,tagName)==0){
-                    printf("[Error] on line %d: .entry directive name already exists\n",data->lc);
-                    data->containError=TRUE;
+    for (i = 0; i <= (data->enc); i++) {
+        if (data->entryArr != NULL) {
+            if (strcmp(tagName, "\0") != 0) {
+                if (strcmp(data->entryArr[i].name, tagName) == 0) {
+                    printf("[Error] on line %d: .entry directive name already exists\n", data->lc);
+                    data->containError = TRUE;
                     return 0;
                 }
             }
         }
     }
-    for(i=0;i<=(data->enc);i++){
-        if (data->externArr != NULL){
-            if(strcmp(data->externArr[i].name,tagName)==0){
-                printf("[Error] on line %d: .entry directive name already defined as .extern\n",data->lc);
-                data->containError=TRUE;
+    for (i = 0; i <= (data->enc); i++) {
+        if (data->externArr != NULL) {
+            if (strcmp(data->externArr[i].name, tagName) == 0) {
+                printf("[Error] on line %d: .entry directive name already defined as .extern\n", data->lc);
+                data->containError = TRUE;
                 return 0;
             }
         }
     }
-    addEntry(data,tagName);
+    addEntry(data, tagName);
     return 1;
 }
 
@@ -241,9 +289,9 @@ int entryDirectiveHandler(Data * data, char * tag){
  * Output:		nothing
  */
 /*----------------------------------------------------------------------------*/
-void addEntry(Data * data, char * tag){
-    data->entryArr = realloc(data->entryArr, sizeof(Entry)*(data->enc+1));
-    strcpy((data->entryArr[(data->enc)]).name,tag);
+void addEntry(Data *data, char *tag) {
+    data->entryArr = realloc(data->entryArr, sizeof(Entry) * (data->enc + 1));
+    strcpy((data->entryArr[(data->enc)]).name, tag);
     data->enc++;
 }
 
@@ -254,10 +302,9 @@ void addEntry(Data * data, char * tag){
  * Output:		nothing
  */
 /*----------------------------------------------------------------------------*/
-void addExtern(Data * data, char * tag){
-    data->externArr = realloc(data->externArr, sizeof(Extern)*(data->exc+1));
-    strcpy(data->externArr[data->exc].name,tag);
-
+void addExtern(Data *data, char *tag) {
+    data->externArr = realloc(data->externArr, sizeof(Extern) * (data->exc + 1));
+    strcpy(data->externArr[data->exc].name, tag);
     data->exc++;
 }
 
@@ -268,49 +315,88 @@ void addExtern(Data * data, char * tag){
  * Output:		1 if letter or number, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
-int externDirectiveHandler(Data * data, char * tag){
+int externDirectiveHandler(Data *data, char *tag) {
     char tagName[MAX_TAG_LEN];
-    int i=0;
-    tagName[0]=0;
-    if(*tag != '\0'){
-        printf("[Error] on line %d: a .extern directive can't start with a tag\n",data->lc);
-        data->containError=TRUE;
+    int i = 0;
+    tagName[0] = 0;
+    if (*tag != '\0') {
+        printf("[Error] on line %d: a .extern directive can't start with a tag\n", data->lc);
+        data->containError = TRUE;
         return 0;
     }
-    if(*(data->line) =='\n' || *(data->line)==EOF){
-        printf("[Error] on line %d: empty directive\n",data->lc);
-        data->containError=TRUE;
+    if (*(data->line) == '\n' || *(data->line) == EOF) {
+        printf("[Error] on line %d: empty directive\n", data->lc);
+        data->containError = TRUE;
         return 0;
     }
-    getTagOperand(data,tagName);
-    if(tagName==NULL){
-        printf("[Error] on line %d: malformed .extern directive\n",data->lc);
-        data->containError=TRUE;
+    getTagOperand(data, tagName);
+    if (tagName == NULL) {
+        printf("[Error] on line %d: malformed .extern directive\n", data->lc);
+        data->containError = TRUE;
         return 0;
     }
     /* search if tag already exists in entry array */
-    for(i=0;i<(data->enc);i++){
-        if (data->entryArr != NULL){
-            if (strcmp(tagName,"\0") != 0){
-                if(strcmp(data->entryArr[i].name,tagName)==0){
-                    printf("[Error] on line %d: .extern directive name already defined as .entry\n",data->lc);
-                    data->containError=TRUE;
+    for (i = 0; i < (data->enc); i++) {
+        if (data->entryArr != NULL) {
+            if (strcmp(tagName, "\0") != 0) {
+                if (strcmp(data->entryArr[i].name, tagName) == 0) {
+                    printf("[Error] on line %d: .extern directive name already defined as .entry\n", data->lc);
+                    data->containError = TRUE;
                     return 0;
                 }
             }
         }
     }
     /* search if tag already exists in extern array */
-    for(i=0;i<(data->exc);i++){
-        if (data->externArr != NULL){
-            if(strcmp(data->externArr[i].name,tagName)==0){
-                printf("[Error] on line %d: .extern directive name already exists\n",data->lc);
-                data->containError=TRUE;
+    for (i = 0; i < (data->exc); i++) {
+        if (data->externArr != NULL) {
+            if (strcmp(data->externArr[i].name, tagName) == 0) {
+                printf("[Error] on line %d: .extern directive name already exists\n", data->lc);
+                data->containError = TRUE;
                 return 0;
             }
         }
     }
-    addExtern(data,tagName);
+    addExtern(data, tagName);
     return 1;
 }
+
+/*----------------------------------------------------------------------------*/
+/*
+ * Description: handles the entry directive parsing and add to array
+ * Input:       Data struct, string tag
+ * Output:		1 if letter or number, 0 otherwise
+ */
+/*----------------------------------------------------------------------------*/
+int entryDirectiveHandlerSecondPass(Data *data) {
+    char tagName[MAX_TAG_LEN];
+    int tagIndex = -1;
+    int i;
+    tagName[0] = 0;
+
+    getTagOperand(data, tagName);
+    //    TODO remove this if check
+    if (tagName == NULL) {
+        printf("[Error] on line %d: malformed .entry directive\n", data->lc);
+        data->containError = TRUE;
+        return 0;
+    }
+
+    for (i = 0; i <= (data->tc); i++) {
+
+        if ( strcmp(data->tagArr[i].name,tagName) ==0 ) {
+            tagIndex = i;
+            data->tagArr[i].entry = 1;
+        }
+    }
+
+    if (tagIndex == -1) {
+        printf("[Error] on line %d: .entry directive have been defined but wasn't found!\n", data->lc);
+        data->containError = TRUE;
+        return 0;
+    }
+
+    return 1;
+}
+
 

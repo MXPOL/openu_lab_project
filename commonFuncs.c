@@ -44,6 +44,26 @@ void eatLine(FILE * fp) {
         c=fgetc(fp);
     }
 }
+
+char* deblank(char* input)
+{
+    int loop;
+    char *output = (char*) malloc (strlen(input));
+    char *dest = output;
+
+    if (output)
+    {
+        for (loop=0; loop<strlen(input); loop++)
+            if (input[loop] != ' ')
+                *dest++ = input[loop];
+
+        *dest = '\0';
+    }
+    return output;
+
+}
+
+
 /*----------------------------------------------------------------------------*/
 /*
  * Description: ove the string pointer beyond all the spaces in the line
@@ -75,7 +95,7 @@ int isEndOfLine(char* pStr){
  */
 /*----------------------------------------------------------------------------*/
 char* getCharPtrBeyondSpace(char * ptr){
-    while(isspace(*ptr)){
+    while(isspace(*ptr) ){
         if (*ptr == '\n' || *ptr== EOF){
             return ptr;
         }

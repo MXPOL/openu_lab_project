@@ -1,18 +1,15 @@
 #include "header.h"
 
 int main(int argc, char *argv[]) {
-
-
-
     /* string to hold a filename after addition of the ".as" suffix */
     /* we add 3 to the array size to hold the ".as" suffix, which is not received
      * as input and will be included later on */
     char filename[MAX_LINE_LEN + 3];
-
-    FILE *fp = NULL;
     int i;
+    FILE *fp = NULL;
+
     /* check if the program was ran with 0 arguments */
-    if (argc ==1) {
+    if (argc == 1) {
         printf("ERROR No files to compile\n");
         return 1;
     }

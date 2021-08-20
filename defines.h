@@ -2,20 +2,21 @@
 #ifndef LAB_PROJECT_DEFINES_H
 #define LAB_PROJECT_DEFINES_H
 
-
 /*This file contains enumerations and defines of constants*/
 
 /*boolean enum*/
 enum boolean {FALSE, TRUE};
+enum {FIRST_PASS,SECOND_PASS};
+
 
 /*Maximum line buffer size*/
 #define MAX_LINE_LEN 80
-
-/*Maximum label buffer length*/
-#define MAX_LABEL_LENGTH 31
-
 /* maximum length of a tag is 31 */
 #define MAX_TAG_LEN 31
+/* maximum length of command*/
+#define MAX_COMMAND_LENGTH 4
+/* maximum length of operand*/
+#define MAX_OPERAND_LENGTH 80
 
 /*Maximum filename size*/
 #define MAX_FILENAME 50
@@ -23,18 +24,13 @@ enum boolean {FALSE, TRUE};
 /*Number of registers*/
 #define NUM_OF_REGISTERS 32
 
-
 /*Directive string constants, to be compared with input*/
-
 #define MAX_DIRECTIVE_LEN 6
-/* kind :
- 0 - db
- 1 - dh
- 2 - dw
- 3 - asciz
-*/
 
-enum DIRECTIVE_KIND{DB, DH, DW, ASCIZ};
+#define thereIsATag(tag) (tag != NULL && *tag != '\0')
+
+enum DIRECTIVE_KIND{CODE,DATA_DB, DATA_DH, DATA_DW, DATA_ASCIZ};
+enum INSTRUCTION_TYPE {TYPE_R,TYPE_I,TYPE_J};
 
 #define STR_DIRECTIVE_DB "db"
 #define STR_DIRECTIVE_DH "dh"
@@ -115,9 +111,16 @@ enum DIRECTIVE_KIND{DB, DH, DW, ASCIZ};
 #define EMPTY_OPERAND -1
 #define TAG_OPERAND 1
 #define REGISTER_OPERAND 3
+#define IMMEDIATE_OPERAND 0
 
-
-
+/* operands types */
+#define REGISTER 10
+#define IMMEDIATE 11
+#define LABEL 12
+#define REGISTER_IMMEDIATE 13
+#define REGISTER_LABEL 14
+#define OPERAND_NOT_USED 15
+#define FUNCT_NOT_USED 15
 
 
 #endif
