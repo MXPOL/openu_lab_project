@@ -7,10 +7,14 @@
 /*boolean enum*/
 enum boolean {FALSE, TRUE};
 enum {FIRST_PASS,SECOND_PASS};
+enum {YES,NO,ERROR,INVALID};
+
+#define LABEL_NOT_FOUND -1
+
 
 
 /*Maximum line buffer size*/
-#define MAX_LINE_LEN 80
+#define MAX_LINE_LEN 81
 /* maximum length of a tag is 31 */
 #define MAX_TAG_LEN 31
 /* maximum length of command*/
@@ -47,8 +51,8 @@ enum INSTRUCTION_TYPE {TYPE_R,TYPE_I,TYPE_J};
 /*Maximum and minimum values that can be stored in data*/
 /* 1 byte = 8 bits */
 /*1 byte*/
-#define MAX_NUMBER_DATA_DB 128
-#define MIN_NUMBER_DATA_DB -127
+#define MAX_NUMBER_DATA_DB 127
+#define MIN_NUMBER_DATA_DB -128
 /*2 bytes*/
 #define MAX_NUMBER_DATA_DH 32767
 #define MIN_NUMBER_DATA_DH -32768
@@ -71,6 +75,7 @@ enum INSTRUCTION_TYPE {TYPE_R,TYPE_I,TYPE_J};
 /*Amoount of opcodes*/
 #define OPCODES_AMOUNT 27
 #define NUM_OF_COMMANDS 27
+#define NUM_OF_RESERVED_WORD 33
 
 /*Opcodes*/
 #define OPCODE_MOVE 1
@@ -109,18 +114,21 @@ enum INSTRUCTION_TYPE {TYPE_R,TYPE_I,TYPE_J};
 /* addressing methods */
 
 #define EMPTY_OPERAND -1
-#define TAG_OPERAND 1
-#define REGISTER_OPERAND 3
-#define IMMEDIATE_OPERAND 0
+#define TAG_OPERAND 12
+#define REGISTER_OPERAND 10
+#define IMMEDIATE_OPERAND 11
 
 /* operands types */
 #define REGISTER 10
 #define IMMEDIATE 11
 #define LABEL 12
+#define EMPTY -1
+
 #define REGISTER_IMMEDIATE 13
 #define REGISTER_LABEL 14
 #define OPERAND_NOT_USED 15
 #define FUNCT_NOT_USED 15
+
 
 
 #endif

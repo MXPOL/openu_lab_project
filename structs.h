@@ -35,7 +35,7 @@ typedef struct{
 /*Label/Tag  structures */
 /*----------------------------------------------------------------------------*/
 typedef struct{
-    char name[MAX_TAG_LEN];
+    char name[MAX_TAG_LEN + 1];
     int address;
     int external;
     int entry;
@@ -60,11 +60,14 @@ typedef struct{
 
 typedef struct{
     char name[MAX_TAG_LEN];
+    int address;
 } Entry;
 
 
 typedef struct{
     char name[MAX_TAG_LEN];
+    int * icArr;
+    int appearance;
 } Extern;
 
 typedef struct{
@@ -74,9 +77,8 @@ typedef struct{
     int lc;
 
     /* Data */
-    Directive * directiveArr2;
+    Directive * directiveArr;
     int * directiveArrIndex;
-    int * directiveArr;
     int dc;
     int dcf;
 
@@ -100,23 +102,6 @@ typedef struct{
     /* entry counter */
     int enc;
     Entry * entryArr;
-
-    /* Remove for sure*/
-    /* extra words counter */
-    int wc;
-
-    /* Remove In The End*/
-
-
-
-
-
-    Symbol * symbolArr;
-    int symbolCounter;
-    /*
-    ExtraWord * wordArr;
-    */
-
 
     /* if there's an error, no need for a second pass */
     int containError;

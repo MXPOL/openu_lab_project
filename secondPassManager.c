@@ -30,6 +30,8 @@ void secondPassManager( Data * data, FILE *file){
         data->lc++;
     }
 
+
+
     /*printInstArr(data);*/
 }
 
@@ -41,14 +43,17 @@ void secondPassManager( Data * data, FILE *file){
  */
 /*----------------------------------------------------------------------------*/
 int lineHandlerSecondPass(Data * data, FILE * file){
-    char tag[31];
-    /*should do nothing if there's a tag at the start of the line*/
+    char tag[MAX_LINE_LEN + 1 ] = { 0 };
+    int i;
+
     if(lineEmptyCheck(data)==1){
         return 1;
     }
     if(lineCommentCheck(data)==1){
         return 1;
     }
+
+    /*should do nothing if there's a tag at the start of the line*/
     getTag(data,tag);
     if (*tag != '\0'){
         eatSpace(data);

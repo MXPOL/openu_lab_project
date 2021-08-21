@@ -58,36 +58,13 @@ void printInstArr(Data *data) {
 void printDirectiveArr(Data *data) {
     int i;
     printf("DATA COUNT: %d  \n", data->dc);
-/*
-    for(i=0;i<(data->dc);i++){
-        printf("(%d,",i);
-        switch ((data->directiveArrIndex[i])) {
-            case DATA_ASCIZ:
-                printf("ASCIZ,");
-                break;
-            case DATA_DB:
-                printf("DB,");
-                break;
-            case DATA_DH:
-                printf("DH,");
-                break;
-            case DATA_DW:
-                printf("DW,");
-                break;
-            default:
-                printf("(  ,");
-                break;
-        }
-        printf( "%d)-" ,data->directiveArr[i]);
-    }
-    printf("\n");*/
     printf("[dataIndex,tagNumber,icf,Kind,Data] ");
     for (i = 0; i < (data->dc); i++) {
         printf("[");
         printf("%d,", i);
-        printf("%d,", data->directiveArr2[i].tagNumber);
-        printf("%d,", data->directiveArr2[i].icf);
-        switch ((data->directiveArr2[i].kind)) {
+        printf("%d,", data->directiveArr[i].tagNumber);
+        printf("%d,", data->directiveArr[i].icf);
+        switch ((data->directiveArr[i].kind)) {
             case DATA_ASCIZ:
                 printf("ASCIZ,");
                 break;
@@ -104,7 +81,7 @@ void printDirectiveArr(Data *data) {
                 printf(" ,");
                 break;
         }
-        printf("%d", data->directiveArr2[i].data);
+        printf("%d", data->directiveArr[i].data);
         printf("] ");
     }
 }
@@ -120,48 +97,6 @@ void printEntryArr(Data *data) {
     for (i = 0; i < data->exc; i++) {
         printf("[%s]", data->externArr[i].name);
     }
-
-}
-
-void updateDataTable(Data *data) {
-    int i;
-    int j;
-    int jump;
-
-
-    for (i = 0; i < (data->dc); i++) {
-        data->directiveArr2[i].icf += data->ic;
-        switch (data->directiveArr2[i].kind) {
-            case DATA_ASCIZ:
-            case DATA_DB:
-                jump = 0;
-                break;
-            case DATA_DH:
-                jump = 1;
-                break;
-            case DATA_DW:
-                jump = 3;
-                break;
-        }
-
-        data->ic += jump;
-        data->dcf += jump + 1;
-
-    }
-
-
-    for (i = 0; i < data->tc; i++) {
-        if (data->tagArr[i].kind == DATA_DH || data->tagArr[i].kind == DATA_DB ||
-            data->tagArr[i].kind == DATA_DW || data->tagArr[i].kind == DATA_ASCIZ) {
-            while (i != data->directiveArr2[j].tagNumber) {
-                j++;
-            }
-
-            data->tagArr[i].address = data->directiveArr2[j].icf;
-
-        }
-    }
-    printf("\n");
 
 }
 
@@ -183,11 +118,11 @@ int firstPassManager(Data *data, FILE *file) {
         lineHandler(data, file);
     }
 
-
     updateDataTable(data);
+
+    printDirectiveArr(data);
     printSymbolTable(data);
     printInstArr(data);
-    printDirectiveArr(data);
     printEntryArr(data);
 
 
@@ -202,7 +137,7 @@ int firstPassManager(Data *data, FILE *file) {
  */
 /*----------------------------------------------------------------------------*/
 int lineHandler(Data *data, FILE *file) {
-    char tag[MAX_TAG_LEN] = { 0 };
+    char tag[MAX_LINE_LEN + 1 ] = { 0 };
 
     if (lineLengthCheck(data, file) == 0) {
         return 0;
@@ -218,6 +153,22 @@ int lineHandler(Data *data, FILE *file) {
 
     /* there's a tag at the start of the line */
     if (*tag != '\0') {
+        if (strlen(tag) > 31 ){
+            printf("[Error] on line %d: label cant be longer than %d chars\n", data->lc, MAX_TAG_LEN );
+            data->containError = TRUE;
+            return 0;
+        }
+        if (isdigit(*tag)){
+            printf("[Error] on line %d: label can not start with number\n", data->lc);
+            data->containError = TRUE;
+            return 0;
+        }
+        if (isItReservedWord(tag) == 1){
+            printf("[Error] on line %d: label can not be saved word\n", data->lc);
+            data->containError = TRUE;
+            return 0;
+        }
+
         if (tagDupCheck(data, tag) == 1) {
             printf("[Error] on line %d: you have the tag %s more then once.\n", data->lc, tag);
             data->containError = TRUE;
@@ -225,6 +176,8 @@ int lineHandler(Data *data, FILE *file) {
         }
         eatSpace(data);
     }
+
+
 
     if (*(data->line) == '.') {
         return directivesManager(data, tag, FIRST_PASS);
@@ -249,7 +202,8 @@ int lineHandler(Data *data, FILE *file) {
  */
 /*----------------------------------------------------------------------------*/
 int lineLengthCheck(Data *data, FILE *file) {
-    if (strlen(data->line) >= MAX_LINE_LEN - 1 && (data->line)[MAX_LINE_LEN - 1] != EOF &&
+
+    if (strlen(data->line) >= MAX_LINE_LEN  && (data->line)[MAX_LINE_LEN - 1] != EOF &&
         (data->line)[MAX_LINE_LEN - 1] != '\n') {
         printf("[Error] on line %d: line is longer than %d chars\n", data->lc, MAX_LINE_LEN);
         data->containError = TRUE;

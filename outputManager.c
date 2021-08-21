@@ -5,51 +5,9 @@
  ====================================================================================
  */
 
-
 #include "header.h"
 #define BASE32 32
 #define MAX_NAME_LEN 80
-
-char *decimal_to_binary2(int number, int bits)
-{
-    int c, d, count;
-    char *pointer;
-    int useFlag = number<0 ? 1 : 0;
-    int flag = 0;
-
-    count = 0;
-
-
-    number = number < 0 ? number *-1 : number;
-    pointer = (char*)malloc(bits);
-    if ( pointer == NULL )
-        exit(EXIT_FAILURE);
-
-
-    for ( c = bits-1 ; c >= 0 ; c-- )
-    {
-        d = number >> c;
-        if ( d & 1 )
-            *(pointer+count) = '1';
-        else
-            *(pointer+count) = '0';
-        count++;
-    }
-
-    for ( c = bits-1 ; c >= 0 ; c-- )
-    {
-        if (flag == 1 ){
-            *(pointer+c) = *(pointer+c) == '1' ? '0' : '1';
-        }
-        if ( useFlag == 1 && *(pointer+c) == '1' ){
-            flag = 1;
-        }
-
-    }
-
-
-    return pointer;
-}
 
 /*----------------------------------------------------------------------------*/
 /*
@@ -57,10 +15,13 @@ char *decimal_to_binary2(int number, int bits)
  * Input:       Data struct
  * Output:		nothing
  */
+
+
 /*----------------------------------------------------------------------------*/
 void outputManager(Data * data, char * filename){
     char outputFileName[MAX_NAME_LEN];
     char temp[33];
+    char line[80];
     int instructionIndex;
     int currentInstruction;
     int dataIndex=0;
@@ -90,37 +51,36 @@ void outputManager(Data * data, char * filename){
         printf("%d : ",instructionIndex);
         switch (info.instructionType) {
             case TYPE_R:
-                create_R_Instruction(data,outputFileName,inst);
+                create_R_Instruction(data,outputFileName,instructionIndex,inst);
                 break;
             case TYPE_I:
-                create_I_Instruction(data,outputFileName,inst);
+                create_I_Instruction(data,outputFileName,instructionIndex,inst);
                 break;
             case TYPE_J:
-                create_J_Instruction(data,outputFileName,inst);
+                create_J_Instruction(data,outputFileName,instructionIndex,inst);
                 break;
         }
     }
     j = 0;
 
     for (dataIndex = 0 ; dataIndex < data->dc  ; dataIndex ++) {
-        switch (data->directiveArr2[dataIndex].kind) {
+        switch (data->directiveArr[dataIndex].kind) {
             case DATA_DB:
             case DATA_ASCIZ:
-                p = decimal_to_binary(data->directiveArr2[dataIndex].data, 8);
-                hex = littleEn(p, strlen(p));
+                p = decimal_to_binary(data->directiveArr[dataIndex].data, 8);
                 buff = (char *) realloc(buff, strlen(buff) + strlen(p) + 1);
                 strcat(buff, p);
                 free(p);
                 break;
             case DATA_DH:
-                p = decimal_to_binary(data->directiveArr2[dataIndex].data, 16);
+                p = decimal_to_binary(data->directiveArr[dataIndex].data, 16);
                 buff = (char *) realloc(buff, strlen(buff) + strlen(p) + 1);
                 hex = fix16(p);
                 strcat(buff, hex);
                 free(p);
                 break;
             case DATA_DW:
-                p = decimal_to_binary(data->directiveArr2[dataIndex].data, 32);
+                p = decimal_to_binary(data->directiveArr[dataIndex].data, 32);
                 buff = (char *) realloc(buff, strlen(buff) + strlen(p) + 1);
                 hex = fix32(p);
                 strcat(buff, hex);
@@ -132,16 +92,46 @@ void outputManager(Data * data, char * filename){
     }
 
     while ( *buff ){
-        memcpy( temp, buff , 32);
+        strncpy( temp, buff , 32);
         temp[33] = '\0';
         hex = binaryToHex(temp, strlen(temp) - 1);
         printf("%d temp :%s %s\n", data->ic, temp, hex,strlen(temp));
+        snprintf(line, sizeof(line), "%d\t%s", data->ic,hex);
+        writeToOutputFile(line, outputFileName);
+
         data->ic +=4;
         buff += 32;
 
     }
+    printf("\n\n");
+    for (dataIndex = 0 ; dataIndex < data->exc  ; dataIndex ++) {
+        for (j = 0 ; j <data->externArr[dataIndex].appearance; j++){
+            printf("%s : %d\n",data->externArr[dataIndex].name,data->externArr[dataIndex].icArr[j]);
+        }
+
+    }
+
+    /* remove the .ob extension */
+    strcpy(outputFileName,filename);
+
+
+    if(data->exc>0){
+        strcat(outputFileName, ".ext");
+        writeExternToFile(data,outputFileName);
+    }
+
+    /* remove the .ext extension */
+    strcpy(outputFileName,filename);
+
+    if(data->enc>0){
+        strcat(outputFileName, ".ent");
+        writeEntryToFile(data,outputFileName);
+    }
+
 
 }
+
+
 
 /*----------------------------------------------------------------------------*/
 /*
@@ -178,7 +168,7 @@ void createOutputZeroExtra(Data * data, char * filename, int instructionIndex){
  * Output:		nothing
  */
 /*----------------------------------------------------------------------------*/
-void create_R_Instruction(Data * data, char * filename, Instruction *instruction){
+void create_R_Instruction(Data * data, char * filename,int instructionIndex, Instruction *instruction){
     char buf[33];
     char * hex;
 
@@ -200,6 +190,7 @@ void create_R_Instruction(Data * data, char * filename, Instruction *instruction
 
     free(hex);
 
+    snprintf(buf, sizeof(buf), "%d\t%s", instructionIndex,hex);
     writeToOutputFile(buf, filename);
     free(opcode);
     free(rs);
@@ -216,7 +207,7 @@ void create_R_Instruction(Data * data, char * filename, Instruction *instruction
  * Output:		nothing
  */
 /*----------------------------------------------------------------------------*/
-void create_I_Instruction(Data * data, char * filename, Instruction *instruction){
+void create_I_Instruction(Data * data, char * filename,int instructionIndex, Instruction *instruction){
     char buf[33];
     int num;
     char * hex;
@@ -231,6 +222,7 @@ void create_I_Instruction(Data * data, char * filename, Instruction *instruction
     num = binary2decimal(buf);
     hex = littleEn(buf,strlen(buf));
     printf("%08x %s\n", num,hex);
+    snprintf(buf, sizeof(buf), "%d\t%s", instructionIndex,hex);
     writeToOutputFile(buf, filename);
     free(opcode);
     free(rs);
@@ -245,22 +237,26 @@ void create_I_Instruction(Data * data, char * filename, Instruction *instruction
  * Output:		nothing
  */
 /*----------------------------------------------------------------------------*/
-void create_J_Instruction(Data * data, char * filename, Instruction *instruction){
-    char buf[33];
+void create_J_Instruction(Data * data, char * filename,int instructionIndex, Instruction *instruction){
+    char buf[80];
     int num;
     char *hex;
     char * opcode = decimal_to_binary(instruction->opcode,6);
     char * reg = decimal_to_binary(instruction->reg,1);
     char * address = decimal_to_binary(instruction->address,25);
+
+
     snprintf(buf, sizeof(buf), "%s%s%s", opcode, reg, address);
 
 
     printf("%s ",buf);
     num = binary2decimal(buf);
     hex = littleEn(buf,strlen(buf));
-
     printf("%08x %s\n", num,hex);
+
+    snprintf(buf, sizeof(buf), "%d\t%s", instructionIndex,hex);
     writeToOutputFile(buf, filename);
+
     free(opcode);
     free(reg);
     free(address);
@@ -281,26 +277,22 @@ void writeLengthsToFile(Data * data, char * filename){
     char * base32InstructionLength = NULL;
     char instructionLength [80];
     char dataLength [80];
+    char buff [80];
 
     char * base32DataLength = NULL;
 
+    /*
     sprintf(instructionLength, "%d", ((data -> ic) -100));
     sprintf(dataLength, "%d", data -> dcf);
+*/
+
+    sprintf(buff, "\t%d %d", ((data -> ic) -100),data -> dcf);
 
     file = fopen(filename, "w");
 
     /* Write instructions to file */
-    base32InstructionLength = decimalToBase32(data->ic);
-    fputs(instructionLength, file);
-    free(base32InstructionLength);
+    fputs(buff, file);
 
-    /* seperate by space between instruction and data length */
-    fputc(' ', file);
-
-    /* Write data length to file */
-    base32DataLength = decimalToBase32(data->dc);
-    fputs(dataLength,file);
-    free(base32DataLength);
 
     /* code is seperated by a new line */
     fputc('\n', file);
@@ -504,5 +496,55 @@ int binary2decimal(char * bin)
 
     return converted;
 
+}
+
+/*----------------------------------------------------------------------------*/
+/*
+ * Description: write all the external variables to file
+ * Input:       Data sturct, string filename
+ * Output:		nothing
+ */
+/*----------------------------------------------------------------------------*/
+void writeExternToFile(Data * data,char * filename) {
+    FILE *file;
+    int i=0;
+    int j =0;
+    char line[100];
+
+    file = fopen(filename, "w");
+
+    for (i= 0 ; i < data->exc  ; i++) {
+        for (j = 0 ; j <data->externArr[i].appearance; j++){
+            snprintf(line, sizeof(line), "%s\t%d", data->externArr[i].name,data->externArr[i].icArr[j]);
+            fputs(line, file);
+            fputc('\n', file);
+        }
+
+    }
+    fclose(file);
+
+
+
+}
+
+/*----------------------------------------------------------------------------*/
+/*
+ * Description: write all the entry variables to file
+ * Input:       Data sturct, string filename
+ * Output:		nothing
+ */
+/*----------------------------------------------------------------------------*/
+void writeEntryToFile(Data * data,char * filename) {
+    FILE *file;
+    char line[100];
+    int i=0;
+
+    file = fopen(filename, "w");
+    for(i=0;i<data->enc;i++){
+        snprintf(line, sizeof(line), "%s\t%d", data->entryArr[i].name,data->entryArr[i].address);
+        fputs(line, file);
+        fputc('\n', file);
+    }
+    fclose(file);
 }
 

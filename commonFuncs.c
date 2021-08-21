@@ -45,22 +45,46 @@ void eatLine(FILE * fp) {
     }
 }
 
-char* deblank(char* input)
-{
-    int loop;
-    char *output = (char*) malloc (strlen(input));
-    char *dest = output;
 
-    if (output)
+/*----------------------------------------------------------------------------*/
+/*
+ * Description: Deletes spaces whether it's at the beginning or at the end
+ * Input: pointer to a string
+ * Output: nothing
+ */
+/*----------------------------------------------------------------------------*/
+
+void deleteSpaces(char* input)
+{
+    /*
+    int loop;
+    char *fixed_input = (char*) malloc (strlen(input));
+    char *temp = fixed_input;
+
+    if (fixed_input)
     {
         for (loop=0; loop<strlen(input); loop++)
             if (input[loop] != ' ')
-                *dest++ = input[loop];
+                *temp++ = input[loop];
 
-        *dest = '\0';
+        *temp = '\0';
     }
-    return output;
 
+    strcpy(input,fixed_input);
+    free(fixed_input);
+    */
+
+    int endOfString = strlen(input) - 1;
+    char * tempStr =  (char*) malloc (strlen(input));
+    strcpy(tempStr,input);
+
+    while (input[endOfString]== ' '){
+        endOfString--;
+    }
+
+    *(tempStr + endOfString + 1 ) ='\0';
+    strcpy(input,tempStr);
+    free(tempStr);
 }
 
 
@@ -95,7 +119,7 @@ int isEndOfLine(char* pStr){
  */
 /*----------------------------------------------------------------------------*/
 char* getCharPtrBeyondSpace(char * ptr){
-    while(isspace(*ptr) ){
+    while(isspace(*ptr)){
         if (*ptr == '\n' || *ptr== EOF){
             return ptr;
         }
@@ -206,13 +230,15 @@ int lineCommentCheck(Data * data){
 /*----------------------------------------------------------------------------*/
 void getTag(Data * data,char * tagGet){
 
-    char tag[MAX_TAG_LEN];
+    char tag[MAX_LINE_LEN];
     int counter = 0;
     char * c = data-> line + 1;
+/*
     if (checkLetters(*(data->line))== 0){
         *tagGet='\0';
         return;
     }
+    */
     while(!isspace(*c) && *c != ':' && *c != '\n'){
         if (checkLetterOrNumber(*c) == 0){
             *tagGet='\0';
@@ -221,6 +247,7 @@ void getTag(Data * data,char * tagGet){
         counter++;
         c++;
     }
+
     if(isspace(*c) || *c=='\n'){
 
         *tagGet='\0';
@@ -267,31 +294,6 @@ void getTagOperand(Data * data, char * tagGet){
     char * c = tag;
 
     sscanf(data->line, " %s", c);
-    /* printf("tagGet: %s \n", tag);*/
-
     stringRemoveNonAlphaNum(c);
-    /*
-
-     if (checkLetters(*c)== 0){
-         tagGet=NULL;
-        return;
-    }
-
-    c++;
-    while(isspace(*c) == 0 && *c != '\n' && *c != EOF){
-        if (checkLetterOrNumber(*c) == 0){
-            return;
-        }
-        c++;
-    }
-
-    strcpy(tag,tagGet);
-    strcat(tagGet,"\n");
-
-
-
-    */
     strcpy(tagGet,tag);
-
-
 }

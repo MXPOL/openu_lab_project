@@ -35,7 +35,6 @@ int passManager(FILE *file, char *filename) {
 
     /* reset line counter to 0 */
     data.lc = 1;
-    printf("\n");
 
     /* go over the code for a second time*/
     secondPassManager(&data,file);
@@ -46,6 +45,7 @@ int passManager(FILE *file, char *filename) {
     }
 
     outputManager(&data, filename);
+    setDataFree(&data);
 
     return 1;
 }
@@ -74,7 +74,6 @@ void initializeData(Data *data) {
 
     data->tagArr = NULL;
     data->directiveArr = NULL;
-    data->directiveArr2 = NULL;
     data->directiveArrIndex = NULL;
     data->entryArr = NULL;
     data->externArr = NULL;
@@ -89,13 +88,18 @@ void initializeData(Data *data) {
  */
 /*----------------------------------------------------------------------------*/
 void setDataFree(Data * data){
+    int i;
     /* free all the data in the data struct */
     free(data->tagArr);
     free(data->directiveArr);
-    free(data->externArr);
+
     free(data->entryArr);
-    /*
+
+    for (i = 0 ; i < data->exc ; i++){
+        free(data->externArr[i].icArr);
+    }
+
+    free(data->externArr);
     free(data->instArr);
-    free(data->wordArr);
-    */
+
 }

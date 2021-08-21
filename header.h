@@ -36,12 +36,14 @@ int firstPassManager(Data * data,FILE *file);
 int lineHandler(Data * data, FILE *file);
 int lineLengthCheck(Data * data, FILE *file);
 int tagDupCheck(Data *data, char *tag);
+int getTagAddress(Data *data, char *operand);
 void addTag(Data * data, char * tag, int dirAddress,int kind);
-void addSymbol(Data * data, char * tag, int dirAddress,int kind);
 int createInstruction_R(Data * data,Instruction *newInstruction,InstructionInfo * instructionInfo,
                         int op1Address, int op2Address, int op3Address);
 int createInstruction_I(Data * data,Instruction *newInstruction,InstructionInfo * instructionInfo,
                         int op1Address, int op2Address, int op3Address);
+int createInstruction_J(Data * data,Instruction *newInstruction,InstructionInfo * instructionInfo,
+                        int op1Address);
 
 
 /* commmonFunc declarations*/
@@ -58,14 +60,12 @@ int checkInLimit(char c,int startLimit,int length);
 char* getCharPtrBeyondSpace(char* pString);
 int isEndOfLine(char* pStr);
 void getTagOperand(Data * data, char * tagGet);
-char* deblank(char* input);
+void deleteSpaces (char* input);
 
 /* directivesManager function declarations */
 int directivesManager(Data * data, char * tag,int whatPass);
 int dataDirectiveHandler(Data * data, char * tag,int kind);
-void addDirective(Data * data, int directive,int kind);
-void addDirective2(Data *data, int directive,int tagNumber, int kind);
-void addDataDirective(Data * data, int directive,int *kind);
+void addDirective(Data *data, int directive,int tagNumber, int kind);
 int stringDirectiveHandler(Data * data, char * tag);
 int entryDirectiveHandler(Data * data, char * tag);
 void addEntry(Data * data, char * tag);
@@ -76,27 +76,24 @@ void addExtern(Data * data, char * tag);
 /* firstPassCommandsManager function declarations */
 int firstPassCommandsManager(Data * data, char * tag);
 int getCommandIndex(char* command);
+int isItReservedWord(char *command);
 int getNumOfOperands(int cmdIndex);
-int checkZeroOperands(Data * data, char * tag,int kind);
-int checkOneOperands(Data * data, char * tag,int kind);
 char * getOneOperands(Data * data, char * tag,int kind);
-int isOperandValidSyntax(Data * data, char * operand);
+void updateDataTable(Data *data);
+        int getOperandType(Data *data, char *operand,int operandNumber);
 int getAddressingMethod(Data * data, char * operand);
+int isRegisterOperand(char *operan,char * errorLine);
 int isEmptyOperand(char * operand);
-int isRegisterOperand(char * operand);
+int getRegisterIndex(char * operand);
 int isTagOperand( char * operand);
-int addOneOperandCommand(Data * data, char * tag,int commandIndex);
-int getOpCode(int cmdIndex);
-int getFunct(int cmdIndex);
-int checkTwoOperands(Data * data, char * tag,char* command);
-int checkThreeOperands(Data * data, char * tag,char* command);
-int isImmediateOperand(Data * data,char * operand);
-int getFirstOperandsType(int cmdIndex);
+int isImmediateOperand(Data * data,char * operand,char *errorLine);
+int getImmediateNumber (char *operand, int * num);
 int getInstructionInfo (int cmdIndex, InstructionInfo * instruction);
+int getItExternTagAddress(Data *data, char *operand);
 
 
 int getNOperands(Data * data,int count, char * operand1,char* operand2,char *operand3);
-int checkNOperands(Data * data,int count, char * operand1,char* operand2,char *operand3);
+int checkNOperands(Data * data,InstructionInfo * instructionInfo,int count, char * operand1,char* operand2,char *operand3);
 int AddInstruction(Data * data,int commandIndex, char * operand1,char* operand2,char *operand3);
 int getAddress(Data * data, char * operand, int type);
 
@@ -108,21 +105,25 @@ int lineHandlerSecondPass(Data * data,FILE * file);
 int secondPassCommandManager(Data * data);
 int secondPassCommandHandler(Data * data, int commandIndex, char * operand1,char* operand2,char *operand3);
 int instruction_I_Handler(Data * data, int commandIndex, Instruction *instruction, char * operand1,char* operand2,char *operand3);
-int instruction_J_Handler(Data * data, int commandIndex, Instruction *instruction, char * operand1,char* operand2,char *operand3);
+int instruction_J_Handler(Data * data, int commandIndex, Instruction *instruction, char * operand1);
+int recordExternal(Data * data, int externalIndex);
 
 
 
 /* output manager */
 void outputManager(Data * data, char *);
 void writeLengthsToFile(Data * data, char * filename);
+void writeExternToFile(Data * data,char * filename);
+void writeEntryToFile(Data * data,char * filename);
+
 char* decimalToBase32(unsigned long int decNum);
 char *decimalToBinary(int number, int bits);
 void createOutputZeroExtra(Data * , char * , int);
 void writeToOutputFile(char * output,char *);
 char *decimal_to_binary(int number, int bits);
-void create_R_Instruction(Data * data, char * filename, Instruction *instruction);
-void create_I_Instruction(Data * data, char * filename, Instruction *instruction);
-void create_J_Instruction(Data * data, char * filename, Instruction *instruction);
+void create_R_Instruction(Data * data, char * filename,int instructionIndex, Instruction *instruction);
+void create_I_Instruction(Data * data, char * filename,int instructionIndex, Instruction *instruction);
+void create_J_Instruction(Data * data, char * filename,int instructionIndex, Instruction *instruction);
 int binary2decimal(char * bin);
 
 /* dev func*/

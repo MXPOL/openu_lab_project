@@ -15,9 +15,9 @@
  */
 /*----------------------------------------------------------------------------*/
 int secondPassCommandManager(Data * data){
-    char operand1[MAX_TAG_LEN]= {0};
-    char operand2[MAX_TAG_LEN]= {0};
-    char operand3[MAX_TAG_LEN]= {0};
+    char operand1[MAX_LINE_LEN]= {0};
+    char operand2[MAX_LINE_LEN]= {0};
+    char operand3[MAX_LINE_LEN]= {0};
     char command[5];
     int commandIndex;
     InstructionInfo info;
@@ -29,25 +29,12 @@ int secondPassCommandManager(Data * data){
     commandIndex = getCommandIndex(command);
     getInstructionInfo(commandIndex,&info);
 
-
-
     eatSpace(data);
 
     getNOperands(data,info.operandsCount,operand1,operand2,operand3);
 
     secondPassCommandHandler(data,commandIndex,operand1,operand2,operand3);
     data->ic+=4;
-
-    /*
-    switch (info.operandsCount) {
-        case 1:
-            break;
-        case 2:
-            break;
-        case 3:
-            break;
-    }
-     */
 
     return 1;
 }
@@ -60,18 +47,18 @@ int secondPassCommandManager(Data * data){
  */
 /*----------------------------------------------------------------------------*/
 int secondPassCommandHandler(Data * data, int commandIndex, char * operand1,char* operand2,char *operand3){
+
     int instructionIndex = (data->ic - 100) / 4;
     InstructionInfo info;
     getInstructionInfo(commandIndex,&info);
 
-
     switch (info.instructionType) {
         case TYPE_R:
-            break;
+            return 1;
         case TYPE_I:
             return instruction_I_Handler(data,commandIndex,&(data->instArr[instructionIndex]),operand1,operand2,operand3);
         case TYPE_J:
-            return instruction_J_Handler(data,commandIndex,&(data->instArr[instructionIndex]),operand1,operand2,operand3);
+            return instruction_J_Handler(data,commandIndex,&(data->instArr[instructionIndex]),operand1);
     }
 
     return 1;
@@ -87,15 +74,23 @@ int secondPassCommandHandler(Data * data, int commandIndex, char * operand1,char
 int instruction_I_Handler(Data * data, int commandIndex, Instruction *instruction, char * operand1,char* operand2,char *operand3) {
     InstructionInfo info;
     getInstructionInfo(commandIndex,&info);
+
     int op1Address = getAddress(data,operand1,info.operand1Type);
     int op2Address = getAddress(data,operand2,info.operand2Type);
     int op3Address = getAddress(data,operand3,info.operand3Type);
 
-    if( op3Address == -1 ){
-            printf("[Error] on line %d: tag does not exist\n",data->lc);
+    /* The tag is not in the entry list */
+    if( op3Address == LABEL_NOT_FOUND ){
+        if(getItExternTagAddress(data,operand3) != -1){
+            printf("[Error] on line %d: The tag cannot be external\n",data->lc);
             data->containError = TRUE;
             return 0;
+        }
+        printf("[Error] on line %d: tag does not exist2\n",data->lc);
+        data->containError = TRUE;
+        return 0;
     }
+
 
     if (info.opcode>9 && info.opcode<14){
         instruction->opcode = info.opcode;
@@ -128,21 +123,20 @@ int instruction_I_Handler(Data * data, int commandIndex, Instruction *instructio
  * Output:		1 if no errors are found, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
-int instruction_J_Handler(Data * data, int commandIndex, Instruction *instruction, char * operand1,char* operand2,char *operand3) {
-    int i;
+int instruction_J_Handler(Data * data, int commandIndex, Instruction *instruction, char * operand1) {
+
     InstructionInfo info;
+    int externalIndex = -2 ;
     getInstructionInfo(commandIndex,&info);
     int op1Address = getAddress(data,operand1,info.operand1Type);
-    int op2Address = getAddress(data,operand2,info.operand2Type);
-    int op3Address = getAddress(data,operand3,info.operand3Type);
 
-    for (i = 0; i < (data->exc); i++) {
-        if (strcmp(data->externArr[i].name, operand1) == 0) {
-            op1Address = 0;
-        }
+    if (op1Address == -1){
+        externalIndex = getItExternTagAddress(data,operand1);
+        recordExternal(data,externalIndex);
+        op1Address = 0;
     }
 
-    if (op1Address == -1 &&info.opcode != 63 ){
+    if (externalIndex == -1 && info.opcode != 63){
         printf("[Error] on line %d: tag does not exist\n",data->lc);
         data->containError = TRUE;
         return 0;
@@ -177,5 +171,19 @@ int instruction_J_Handler(Data * data, int commandIndex, Instruction *instructio
 }
 
 
+int recordExternal(Data * data, int externalIndex) {
+    if ( data->externArr[externalIndex].appearance == 0){
+        data->externArr[externalIndex].icArr = (int *)malloc(sizeof(int));
+        data->externArr[externalIndex].icArr[data->externArr[externalIndex].appearance] = data->ic;
+    } else {
+        data->externArr[externalIndex].icArr =
+                (int*) realloc((data->externArr[externalIndex]).icArr,sizeof(int) + data->externArr[externalIndex].appearance +1 );
+        (data->externArr[externalIndex]).icArr[(data->externArr[externalIndex].appearance)] = data->ic;
+    }
 
+    data->externArr[externalIndex].appearance++;
+
+    return 1;
+
+}
 
