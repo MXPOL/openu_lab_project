@@ -51,14 +51,14 @@ enum INSTRUCTION_TYPE {TYPE_R,TYPE_I,TYPE_J};
 /*Maximum and minimum values that can be stored in data*/
 /* 1 byte = 8 bits */
 /*1 byte*/
-#define MAX_NUMBER_DATA_DB 127
-#define MIN_NUMBER_DATA_DB -128
+#define MAX_NUMBER_DATA_DB 128
+#define MIN_NUMBER_DATA_DB -127
 /*2 bytes*/
 #define MAX_NUMBER_DATA_DH 32767
 #define MIN_NUMBER_DATA_DH -32768
 /*4 bytes*/
 #define MAX_NUMBER_DATA_DW 2147483647
-#define MIN_NUMBER_DATA_DW -2147483648
+#define MIN_NUMBER_DATA_DW -2147483647
 
 /* these define the ascii codes 'a' and 'A' */
 #define FIRST_CAPITAL_LETTER_ASCII 65

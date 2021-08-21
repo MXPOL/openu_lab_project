@@ -9,6 +9,8 @@
 #define BASE32 32
 #define MAX_NAME_LEN 80
 
+
+
 /*----------------------------------------------------------------------------*/
 /*
  * Description: generates the output file and writes the code into them
@@ -26,18 +28,20 @@ void outputManager(Data * data, char * filename){
     int currentInstruction;
     int dataIndex=0;
     int wordIndex=0;
-    char * buff = (char *) malloc(1);
+    char * buff = (char *)calloc(1, sizeof(char));  
     char * p;
     int num;
     int j = 0;
     int i;
     char *hex;
-    Instruction * inst;
+    int newSize;
+       Instruction * inst;
     InstructionInfo info;
     char *finalLine = (char *) malloc(1);
     int totalInstruction = (data -> ic);
     strcpy(outputFileName,filename);
     strcat(outputFileName, ".ob");
+
 
 
     /* write the instruction and data lengths to file */
@@ -68,48 +72,62 @@ void outputManager(Data * data, char * filename){
             case DATA_DB:
             case DATA_ASCIZ:
                 p = decimal_to_binary(data->directiveArr[dataIndex].data, 8);
-                buff = (char *) realloc(buff, strlen(buff) + strlen(p) + 1);
-                strcat(buff, p);
-                free(p);
+                newSize = strlen(buff) + 8 + 1;
+                buff = (char *) realloc(buff, sizeof(char)*newSize);
+
+                strcat(buff,p);
+
+                /*strcat(buff,p);*/
+                /*snprintf(buff, sizeof(buff),"%s%s",buff,p);*/
+                /*free(p);*/
+                /*buff = concat(buff,p);*/
                 break;
             case DATA_DH:
                 p = decimal_to_binary(data->directiveArr[dataIndex].data, 16);
-                buff = (char *) realloc(buff, strlen(buff) + strlen(p) + 1);
                 hex = fix16(p);
-                strcat(buff, hex);
-                free(p);
+                newSize = strlen(buff) + 16 + 1;
+                buff = (char *) realloc(buff, sizeof(char)*newSize);
+                /*snprintf(buff, sizeof(buff), "%s%s", buff,hex);*/
+                strcat(buff,hex);
                 break;
             case DATA_DW:
                 p = decimal_to_binary(data->directiveArr[dataIndex].data, 32);
-                buff = (char *) realloc(buff, strlen(buff) + strlen(p) + 1);
                 hex = fix32(p);
-                strcat(buff, hex);
-                free(p);
+                newSize = strlen(buff) + 32 + 1;
+                buff = (char *) realloc(buff, sizeof(char)*newSize);
+                strcat(buff,hex);
+                /*snprintf(buff, sizeof(buff), "%s%s", buff,hex);*/
                 break;
         }
 
 
     }
 
-    while ( *buff ){
+    i =0;
+    p = buff;
+    while(*(p) != '\0'){
+        p++;
+        i++;
+    }
+
+    for (j = 0 ; j < i / 32 ; j ++){
         strncpy( temp, buff , 32);
         temp[33] = '\0';
         hex = binaryToHex(temp, strlen(temp) - 1);
-        printf("%d temp :%s %s\n", data->ic, temp, hex,strlen(temp));
         snprintf(line, sizeof(line), "%d\t%s", data->ic,hex);
         writeToOutputFile(line, outputFileName);
-
+        printf("line : %s \n", line);
         data->ic +=4;
         buff += 32;
-
     }
-    printf("\n\n");
-    for (dataIndex = 0 ; dataIndex < data->exc  ; dataIndex ++) {
-        for (j = 0 ; j <data->externArr[dataIndex].appearance; j++){
-            printf("%s : %d\n",data->externArr[dataIndex].name,data->externArr[dataIndex].icArr[j]);
-        }
 
-    }
+    strncpy( temp, buff , i % 32);
+    temp[i % 32 +1] = '\0';
+    hex = binaryToHex(temp, strlen(temp) - 1);
+    snprintf(line, sizeof(line), "%d\t%s", data->ic,hex);
+    writeToOutputFile(line, outputFileName);
+    printf("line : %s \n", line);
+
 
     /* remove the .ob extension */
     strcpy(outputFileName,filename);
@@ -141,20 +159,6 @@ void outputManager(Data * data, char * filename){
  */
 /*----------------------------------------------------------------------------*/
 void createOutputZeroExtra(Data * data, char * filename, int instructionIndex){
-//    unsigned long int output=0;
-//    char * base32output;
-//    output+=decimalToBinary(data->instArr[instructionIndex].e_r_a);
-//    output+=decimalToBinary(data->instArr[instructionIndex].destination_addressing)*100;
-//    output+=decimalToBinary(data->instArr[instructionIndex].source_addressing)*10000;
-//    output+=decimalToBinary(data->instArr[instructionIndex].opcode)*1000000;
-//    output+=decimalToBinary(data->instArr[instructionIndex].group)*10000000000;
-//
-//    output = binaryToDecimal(output);
-//
-//    base32output = decimalToBase32(output);
-//    writeToOutputFile(base32output, filename);
-//    free(base32output);
-
     char instructionLength [80];
     sprintf(instructionLength, "%d", instructionIndex);
     writeToOutputFile(instructionLength, filename);
@@ -169,9 +173,9 @@ void createOutputZeroExtra(Data * data, char * filename, int instructionIndex){
  */
 /*----------------------------------------------------------------------------*/
 void create_R_Instruction(Data * data, char * filename,int instructionIndex, Instruction *instruction){
-    char buf[33];
+    char line[100];
+    char bitString[50];
     char * hex;
-
     int num;
 
     char * opcode = decimal_to_binary(instruction->opcode,6);
@@ -180,18 +184,17 @@ void create_R_Instruction(Data * data, char * filename,int instructionIndex, Ins
     char * rd = decimal_to_binary(instruction->rd,5);
     char * funct = decimal_to_binary(instruction->funct,5);
     char * not_in_used = decimal_to_binary(0,6);
-    snprintf(buf, sizeof(buf), "%s%s%s%s%s%s", opcode, rs,rt,rd,funct,not_in_used);
-//    snprintf(buf, sizeof(buf), "%s%s%s%s%s%s", not_in_used, funct,rd,rt,rs,opcode);
-    printf("%s ",buf);
-    num = binary2decimal(buf);
-    hex = littleEn(buf,strlen(buf));
+    snprintf(bitString, sizeof(bitString), "%s%s%s%s%s%s", opcode, rs,rt,rd,funct,not_in_used);
+    printf("%s ",bitString);
+    num = binary2decimal(bitString);
+    hex = littleEn(bitString,strlen(bitString));
 
     printf("%08x %s\n", num,hex);
+    snprintf(line, sizeof(line), "%d\t%s", instructionIndex,hex);
+    writeToOutputFile(line, filename);
+
 
     free(hex);
-
-    snprintf(buf, sizeof(buf), "%d\t%s", instructionIndex,hex);
-    writeToOutputFile(buf, filename);
     free(opcode);
     free(rs);
     free(rt);
@@ -216,7 +219,6 @@ void create_I_Instruction(Data * data, char * filename,int instructionIndex, Ins
     char * rt = decimal_to_binary(instruction->rt,5);
     char * immed = decimal_to_binary(instruction->immed,16);
     snprintf(buf, sizeof(buf), "%s%s%s%s", opcode, rs,rt,immed);
-//    snprintf(buf, sizeof(buf), "%s%s%s%s", immed, rt,rs,opcode);
 
     printf("%s ",buf);
     num = binary2decimal(buf);
@@ -224,6 +226,7 @@ void create_I_Instruction(Data * data, char * filename,int instructionIndex, Ins
     printf("%08x %s\n", num,hex);
     snprintf(buf, sizeof(buf), "%d\t%s", instructionIndex,hex);
     writeToOutputFile(buf, filename);
+    free(hex);
     free(opcode);
     free(rs);
     free(rt);
@@ -256,7 +259,7 @@ void create_J_Instruction(Data * data, char * filename,int instructionIndex, Ins
 
     snprintf(buf, sizeof(buf), "%d\t%s", instructionIndex,hex);
     writeToOutputFile(buf, filename);
-
+    free(hex);
     free(opcode);
     free(reg);
     free(address);

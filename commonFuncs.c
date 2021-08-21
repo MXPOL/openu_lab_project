@@ -57,22 +57,6 @@ void eatLine(FILE * fp) {
 void deleteSpaces(char* input)
 {
     /*
-    int loop;
-    char *fixed_input = (char*) malloc (strlen(input));
-    char *temp = fixed_input;
-
-    if (fixed_input)
-    {
-        for (loop=0; loop<strlen(input); loop++)
-            if (input[loop] != ' ')
-                *temp++ = input[loop];
-
-        *temp = '\0';
-    }
-
-    strcpy(input,fixed_input);
-    free(fixed_input);
-    */
 
     int endOfString = strlen(input) - 1;
     char * tempStr =  (char*) malloc (strlen(input));
@@ -85,6 +69,7 @@ void deleteSpaces(char* input)
     *(tempStr + endOfString + 1 ) ='\0';
     strcpy(input,tempStr);
     free(tempStr);
+    */
 }
 
 

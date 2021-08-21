@@ -74,14 +74,14 @@ int directivesManager(Data *data, char *tag, int whatPass) {
 int dataDirectiveHandler(Data *data, char *tag, int kind) {
 
     int i = 0;
+    int state;
     int num;
     int dcounter = 0;
     int numberArray[80];
-    int count;
     int tagNumber = -1;
 
-    int maxNumber;
-    int minNumber;
+    long maxNumber;
+    long minNumber;
 
     switch (kind) {
         case DATA_DB:
@@ -99,7 +99,7 @@ int dataDirectiveHandler(Data *data, char *tag, int kind) {
     }
 
     /* state 1 means check number, state 2 means check comma, state 0 means exit */
-    int state = GET_NUMBER;
+    state = GET_NUMBER;
 
     /* check for an empty data directive */
     if (*(data->line) == '\n' || *(data->line) == EOF) {
@@ -252,13 +252,11 @@ int stringDirectiveHandler(Data *data, char *tag) {
  */
 /*----------------------------------------------------------------------------*/
 int entryDirectiveHandler(Data *data, char *tag) {
-    char tagName[MAX_TAG_LEN];
+    char tagName[100];
     int i;
     tagName[0] = 0;
     if (*tag != '\0') {
         printf("[Warning] on line %d: a .entry directive started with a tag\n", data->lc);
-//        data->containError = TRUE;
-//        return 0;
     }
     if (*(data->line) == '\n' || *(data->line) == EOF) {
         printf("[Error] on line %d: empty directive\n", data->lc);

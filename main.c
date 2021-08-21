@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+
     /*go through the file names array*/
     /* there's no check if the user entered a name with an extension, i.e because
      * (e.g) tuna.as.as is a valid filname */
@@ -35,7 +36,6 @@ int main(int argc, char *argv[]) {
             printf("ERROR The file named %s %s doesn't exist\n", argv[0], filename);
             continue;
         }
-
         passManager(fp, argv[i]);
         fclose(fp);
     }

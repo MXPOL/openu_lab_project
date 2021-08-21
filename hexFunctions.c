@@ -1,18 +1,20 @@
+#include <stdio.h>
+
 #include "header.h"
+
 char *binaryToHex(char *binary, int length)
 {
     int i;
     char *hex;
     char *paddedBinary = padBinary(binary, length);
-    int hexLength = strlen(paddedBinary) / 4;	//	We need one hex symbol for every 4 binary symbols
-    hexLength = hexLength + hexLength/2 + 1;	//	Make place for a space after every two symbols + the null terminater
+    int hexLength = strlen(paddedBinary) / 4;	/*	We need one hex symbol for every 4 binary symbols */
+    hexLength = hexLength + hexLength/2 + 1;	/*	Make place for a space after every two symbols + the null terminater */
     hex = (char *)malloc(hexLength);
     if(hex == NULL)
         exit(1);
     for(i = 0; i < length; i += 8)
     {
         char halfByte[5];
-        // copy the 4 binary digits and decode them to one hex digit
         memcpy(halfByte, paddedBinary, 4);
         halfByte[4] = '\0';
         *hex++ = valueOf(halfByte);
@@ -110,16 +112,15 @@ char * littleEn (char * binary,int length ){
     int i;
     char *hex;
     char *paddedBinary = padBinary(binary, length);
-    int hexLength = strlen(paddedBinary) / 4;	//	We need one hex symbol for every 4 binary symbols
+    int hexLength = strlen(paddedBinary) / 4;	/*	We need one hex symbol for every 4 binary symbols */
     paddedBinary += strlen(paddedBinary);
-    hexLength = hexLength + hexLength/2 + 1;	//	Make place for a space after every two symbols + the null terminater
+    hexLength = hexLength + hexLength/2 + 1;	/*	Make place for a space after every two symbols + the null terminater*/
     hex = (char *)malloc(hexLength);
     if(hex == NULL)
         exit(1);
     for(i = 0; i < length; i += 8)
     {
         char halfByte[5];
-        // copy the 4 binary digits and decode them to one hex digit
         memcpy(halfByte  , paddedBinary - 8 , 4);
         halfByte[4] = '\0';
         *hex++ = valueOf(halfByte);
@@ -216,19 +217,27 @@ char * littleEnStyle (char * binary){
 
 
 char * fix16 ( char *stringBits){
+    
     char *fixedBitsStr;
-    char firstBit [9];
-    char secondBit [9];
+    int i;
+    int j;
 
+    j = 0;
 
-    strncpy(firstBit,stringBits,8);
-    strncpy(secondBit,stringBits+8,8);
+    fixedBitsStr = (char *)calloc(33, sizeof(char));  
 
-    fixedBitsStr = (char *)malloc(20);
-    if(fixedBitsStr == NULL)
-        exit(1);
+    for(i = 8 ; i < 16 ; i ++){
+        *(fixedBitsStr+j) = *(stringBits+i);
+        j++;
+    }
 
-    snprintf(fixedBitsStr, 20, "%s%s", secondBit,firstBit);
+    for(i = 0 ; i < 8 ; i ++){
+        *(fixedBitsStr+j) = *(stringBits+i);
+        j++;
+    }
+
+    *(fixedBitsStr+j) = '\0';
+    printf("%s\n", fixedBitsStr);
 
     return fixedBitsStr;
 
@@ -236,11 +245,49 @@ char * fix16 ( char *stringBits){
 }
 
 char * fix32 ( char *stringBits){
+
+
+
     char *fixedBitsStr;
     char firstBit [9];
     char secondBit [9];
     char thirdBit [9];
     char fourthBit [9];
+    char * part1;
+    char * part2;
+    char  res;
+    int i;
+    int j;
+
+    fixedBitsStr = (char *)calloc(33, sizeof(char));  
+    j =0;
+
+    for(i = 24 ; i < 32 ; i ++){
+        *(fixedBitsStr+j) = *(stringBits+i);
+        j++;
+    }
+
+    for(i = 16 ; i < 24 ; i ++){
+        *(fixedBitsStr+j) = *(stringBits+i);
+        j++;
+    }
+
+    for(i = 8 ; i < 16 ; i ++){
+        *(fixedBitsStr+j) = *(stringBits+i);
+        j++;
+    }
+
+    for(i = 0 ; i < 8 ; i ++){
+        *(fixedBitsStr+j) = *(stringBits+i);
+        j++;
+    }
+
+    *(fixedBitsStr+j) = '\0';
+
+
+    printf("%s\n", fixedBitsStr);
+
+/*
 
 
     strncpy(firstBit,stringBits,8);
@@ -252,8 +299,14 @@ char * fix32 ( char *stringBits){
     if(fixedBitsStr == NULL)
         exit(1);
 
-    snprintf(fixedBitsStr, 33, "%s%s%s%s", fourthBit,thirdBit,secondBit,firstBit);
+    part1 = concat(fourthBit,thirdBit);
+    part2 = concat(secondBit,firstBit);
 
+
+    res = (char *) malloc(33);
+    strcpy(res,part1);
+    strcat(res,part2);
+*/
     return fixedBitsStr;
 
 }

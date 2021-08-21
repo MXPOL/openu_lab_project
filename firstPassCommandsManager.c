@@ -23,11 +23,14 @@ int firstPassCommandsManager(Data *data, char *tag) {
     int operandNum;
     int commandIndex;
 
+    
+
     if (sscanf(data->line, "%4s", command) == 0) {
         printf("[Error] on line %d:- command error invalid\n", data->lc);
         data->containError = TRUE;
         return 0;
     }
+
     commandIndex = getCommandIndex(command);
 
     if (commandIndex == -1) {
@@ -52,8 +55,10 @@ int firstPassCommandsManager(Data *data, char *tag) {
     if (operandNum == 0 && getNOperands(data, 0, op1, op2, op3) == 1) {
 
         if (thereIsATag(tag)) {
+
             addTag(data, tag, data->ic, CODE);
         }
+
 
         AddInstruction(data, commandIndex, op1, op2, op3);
         data->ic += 4;
@@ -67,6 +72,7 @@ int firstPassCommandsManager(Data *data, char *tag) {
             addTag(data, tag, data->ic, CODE);
         }
 
+
         AddInstruction(data, commandIndex, op1, op2, op3);
         data->ic += 4;
         return 1;
@@ -78,6 +84,7 @@ int firstPassCommandsManager(Data *data, char *tag) {
         if (thereIsATag(tag)) {
             addTag(data, tag, data->ic, CODE);
         }
+    
         AddInstruction(data, commandIndex, op1, op2, op3);
         data->ic += 4;
         return 1;
@@ -89,7 +96,6 @@ int firstPassCommandsManager(Data *data, char *tag) {
         if (thereIsATag(tag)) {
             addTag(data, tag, data->ic, CODE);
         }
-
         AddInstruction(data, commandIndex, op1, op2, op3);
         data->ic += 4;
         return 1;
@@ -565,32 +571,37 @@ void updateDataTable(Data *data) {
     int i;
     int j;
     int jump;
-
-
+    
     for (i = 0; i < (data->dc); i++) {
+
         data->directiveArr[i].icf += data->ic;
+
         switch (data->directiveArr[i].kind) {
             case DATA_ASCIZ:
-            case DATA_DB:
-                jump = 0;
+                            jump = 1;
                 break;
-            case DATA_DH:
+            case DATA_DB:
                 jump = 1;
                 break;
+            case DATA_DH:
+                jump = 2;
+                break;
             case DATA_DW:
-                jump = 3;
+                jump = 4;
                 break;
         }
 
-        data->ic += jump;
-        data->dcf += jump + 1;
 
+        data->ic += jump - 1;
+        data->dcf += jump;
     }
 
 
     for (i = 0; i < data->tc; i++) {
+        j = 0;
         if (data->tagArr[i].kind == DATA_DH || data->tagArr[i].kind == DATA_DB ||
             data->tagArr[i].kind == DATA_DW || data->tagArr[i].kind == DATA_ASCIZ) {
+
             while (i != data->directiveArr[j].tagNumber) {
                 j++;
             }

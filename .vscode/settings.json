@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "header.h": "c",
+        "stdio.h": "c"
+    },
+    "clang-format.fallbackStyle": "Google",
+    "files.exclude": {
+        "**.o": true
+    }
+}

@@ -109,7 +109,7 @@ void printEntryArr(Data *data) {
  */
 /*----------------------------------------------------------------------------*/
 int firstPassManager(Data *data, FILE *file) {
-    char lineHolder[MAX_LINE_LEN + 1];
+    char lineHolder[1000 + 1];
 
     /* NULL means EOF. When we reach EOF it means we're done */
     while (fgets(lineHolder, MAX_LINE_LEN, file) != NULL) {
@@ -118,12 +118,18 @@ int firstPassManager(Data *data, FILE *file) {
         lineHandler(data, file);
     }
 
-    updateDataTable(data);
+        updateDataTable(data);
+    
 
-    printDirectiveArr(data);
+        printDirectiveArr(data);
     printSymbolTable(data);
-    printInstArr(data);
+   /* printInstArr(data);
     printEntryArr(data);
+    */
+    
+
+
+
 
 
     return 1;
