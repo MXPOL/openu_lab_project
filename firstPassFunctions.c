@@ -329,7 +329,7 @@ int AddInstruction(Data *data, int commandIndex, char *operand1, char *operand2,
         case TYPE_I:
             return createInstruction_I(data, instruction, &info, op1Address, op2Address, op3Address);
         case TYPE_J:
-            return createInstruction_J(data, instruction, &info, op1Address);
+            return createInstruction_J(instruction, &info, op1Address);
     }
 }
 

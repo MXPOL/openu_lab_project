@@ -38,17 +38,12 @@ int lineLengthCheck(Data * data, FILE *file);
 int tagDupCheck(Data *data, char *tag);
 int getTagAddress(Data *data, char *operand);
 void addTag(Data * data, char * tag, int dirAddress,int kind);
-int createInstruction_R(Data * data,Instruction *newInstruction,InstructionInfo * instructionInfo,
-                        int op1Address, int op2Address, int op3Address);
-int createInstruction_I(Data * data,Instruction *newInstruction,InstructionInfo * instructionInfo,
-                        int op1Address, int op2Address, int op3Address);
-int createInstruction_J(Data * data,Instruction *newInstruction,InstructionInfo * instructionInfo,
-                        int op1Address);
+void updateDataTable(Data *data);
 
 
 /* commmonFunc declarations*/
 int lineCommentCheck(Data * data);
-void getTag(Data * data,char * tagGet);
+int getTag(Data * data,char * tagGet);
 int lineEmptyCheck(Data * data);
 void eatLine(FILE * fp);
 void eatSpace(Data * data);
@@ -79,8 +74,7 @@ int getCommandIndex(char* command);
 int isItReservedWord(char *command);
 int getNumOfOperands(int cmdIndex);
 char * getOneOperands(Data * data, char * tag,int kind);
-void updateDataTable(Data *data);
-        int getOperandType(Data *data, char *operand,int operandNumber);
+int getOperandType(Data *data, char *operand,int operandNumber);
 int getAddressingMethod(Data * data, char * operand);
 int isRegisterOperand(char *operan,char * errorLine);
 int isEmptyOperand(char * operand);
@@ -90,6 +84,13 @@ int isImmediateOperand(Data * data,char * operand,char *errorLine);
 int getImmediateNumber (char *operand, int * num);
 int getInstructionInfo (int cmdIndex, InstructionInfo * instruction);
 int getItExternTagAddress(Data *data, char *operand);
+int createInstruction_R(Data * data,Instruction *newInstruction,InstructionInfo * instructionInfo,
+                        int op1Address, int op2Address, int op3Address);
+int createInstruction_I(Data * data,Instruction *newInstruction,InstructionInfo * instructionInfo,
+                        int op1Address, int op2Address, int op3Address);
+int createInstruction_J(Instruction *newInstruction,InstructionInfo * instructionInfo,
+                        int op1Address);
+int checkIllegalChars(char *command);
 
 
 int getNOperands(Data * data,int count, char * operand1,char* operand2,char *operand3);
@@ -141,6 +142,14 @@ char * fix16bits ( char * binary);
 char * littleEnStyle (char * binary);
 char * fix16 ( char *stringBits);
 char * fix32 ( char *stringBits);
+
+
+/* remove in the end */
+void printEntryArr(Data *data);
+void printDirectiveArr(Data *data);
+void printInstArr(Data *data);
+void printSymbolTable(Data *data);
+
 
 
 #endif

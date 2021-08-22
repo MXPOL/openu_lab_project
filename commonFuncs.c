@@ -210,41 +210,35 @@ int lineCommentCheck(Data * data){
 /*
  * Description: get the tag from beggining of a line
  * Input:       pointer to Data struct, pointer to a character array
- * Output:	    if tag is found tagGet will hold the tag, tagGet will be NULL otherwise
+ * Output:      1 if tag was received , 0 otherwise, tagGet holds the tag if 1.
  */
 /*----------------------------------------------------------------------------*/
-void getTag(Data * data,char * tagGet){
+int getTag(Data * data,char * tagGet){
 
     char tag[MAX_LINE_LEN];
     int counter = 0;
     char * c = data-> line + 1;
-/*
-    if (checkLetters(*(data->line))== 0){
-        *tagGet='\0';
-        return;
-    }
-    */
+
+
     while(!isspace(*c) && *c != ':' && *c != '\n'){
-        if (checkLetterOrNumber(*c) == 0){
-            *tagGet='\0';
-            return;
-        }
         counter++;
         c++;
     }
 
     if(isspace(*c) || *c=='\n'){
-
-        *tagGet='\0';
-        return;
+        return 0 ;
     }
+
     if (*c == ':'){
         counter++;
         strncpy(tag, data->line,counter);
         data->line += counter+2;
         tag[counter] = '\0';
         strcpy(tagGet,tag);
+        return  1;
     }
+
+    return 0;
 }
 
 void stringRemoveNonAlphaNum(char *str)
@@ -282,3 +276,12 @@ void getTagOperand(Data * data, char * tagGet){
     stringRemoveNonAlphaNum(c);
     strcpy(tagGet,tag);
 }
+
+/*----------------------------------------------------------------------------*/
+/*
+ * Description: get the tag from NOT begginig of the line
+ * Input:       pointer to Data struct, pointer to a character array
+ * Output:	    if tag is found tagGet will hold the tag, tagGet will be NULL otherwise
+ */
+/*----------------------------------------------------------------------------*/
+

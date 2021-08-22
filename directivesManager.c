@@ -12,7 +12,7 @@
 /*
  * Description: in charge of directing the handling the different directives
  * Input:       Data struct, string tag
- * Output:		1 if letter or number, 0 otherwise
+ * Output:		1 if successful, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
 int directivesManager(Data *data, char *tag, int whatPass) {
@@ -68,12 +68,12 @@ int directivesManager(Data *data, char *tag, int whatPass) {
 /*
  * Description: handles the data directive parsing and add to array
  * Input:       Data struct, string tag
- * Output:		1 if letter or number, 0 otherwise
+ * Output:		1 if successful, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
 int dataDirectiveHandler(Data *data, char *tag, int kind) {
 
-    int i = 0;
+    int i;
     int state;
     int num;
     int dcounter = 0;
@@ -182,7 +182,7 @@ void addDirective(Data *data, int directive,int tagNumber, int kind) {
 /*
  * Description: handles the string directive parsing and add to array
  * Input:       Data struct, string tag
- * Output:		1 if letter or number, 0 otherwise
+ * Output:		1 if successful, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
 int stringDirectiveHandler(Data *data, char *tag) {
@@ -248,13 +248,15 @@ int stringDirectiveHandler(Data *data, char *tag) {
 /*
  * Description: handles the entry directive parsing and add to array
  * Input:       Data struct, string tag
- * Output:		1 if letter or number, 0 otherwise
+ * Output:		1 if successful, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
 int entryDirectiveHandler(Data *data, char *tag) {
     char tagName[100];
     int i;
+
     tagName[0] = 0;
+
     if (*tag != '\0') {
         printf("[Warning] on line %d: a .entry directive started with a tag\n", data->lc);
     }
@@ -264,11 +266,13 @@ int entryDirectiveHandler(Data *data, char *tag) {
         return 0;
     }
     getTagOperand(data, tagName);
-    if (tagName == NULL) {
+
+    if (tagName == '\0') {
         printf("[Error] on line %d: malformed .entry directive\n", data->lc);
         data->containError = TRUE;
         return 0;
     }
+
     for (i = 0; i <= (data->enc); i++) {
         if (data->entryArr != NULL) {
             if (strcmp(tagName, "\0") != 0) {
@@ -343,7 +347,7 @@ int externDirectiveHandler(Data *data, char *tag) {
         return 0;
     }
     getTagOperand(data, tagName);
-    if (tagName == NULL) {
+    if (tagName == '\0') {
         printf("[Error] on line %d: malformed .extern directive\n", data->lc);
         data->containError = TRUE;
         return 0;
@@ -378,7 +382,7 @@ int externDirectiveHandler(Data *data, char *tag) {
 /*
  * Description: handles the entry directive parsing and add to array
  * Input:       Data struct, string tag
- * Output:		1 if letter or number, 0 otherwise
+ * Output:		1 if successful, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
 int entryDirectiveHandlerSecondPass(Data *data) {
@@ -397,7 +401,7 @@ int entryDirectiveHandlerSecondPass(Data *data) {
     }
 
     if (tagIndex == -1) {
-        printf("[Error] on line %d: .entry directive have been defined but wasn't found!\n", data->lc);
+        printf("[Error] on line %d: .entry directive have been defined but wasn't found\n", data->lc);
         data->containError = TRUE;
         return 0;
     }

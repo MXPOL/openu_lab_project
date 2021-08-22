@@ -24,13 +24,13 @@ int firstPassCommandsManager(Data *data, char *tag) {
     int commandIndex;
 
     
-
+    /* get the command from the line*/
     if (sscanf(data->line, "%4s", command) == 0) {
         printf("[Error] on line %d:- command error invalid\n", data->lc);
         data->containError = TRUE;
         return 0;
     }
-
+    /* find the command index */
     commandIndex = getCommandIndex(command);
 
     if (commandIndex == -1) {
@@ -39,63 +39,73 @@ int firstPassCommandsManager(Data *data, char *tag) {
         return 0;
     }
 
+    /* skipping the command in the line*/
     data->line += strlen(command);
 
+    /* check if there are space after command*/
     if (!isspace(*(data->line))) {
         printf("[Error] on line %d:- extra characters or no space after command name\n", data->lc);
         data->containError = TRUE;
         return 0;
     }
 
+    /* skipping the spaces if there are */
     eatSpace(data);
 
+    /* get info about the command*/
     getInstructionInfo(commandIndex, &instructionInfo);
     operandNum = instructionInfo.operandsCount;
 
+    /* command with zero operands*/
     if (operandNum == 0 && getNOperands(data, 0, op1, op2, op3) == 1) {
 
+        /* if there was tag before the command*/
         if (thereIsATag(tag)) {
-
             addTag(data, tag, data->ic, CODE);
         }
 
-
+        /* add the instruction to the instruction array*/
         AddInstruction(data, commandIndex, op1, op2, op3);
         data->ic += 4;
         return 1;
     }
-
+    /* command with 1 operands */
     if (operandNum == 1 && getNOperands(data, 1, op1, op2, op3) == 1 &&
         checkNOperands(data,&instructionInfo, 1, op1, op2, op3) == 1) {
 
+        /* if there was tag before the command*/
         if (thereIsATag(tag)) {
             addTag(data, tag, data->ic, CODE);
         }
 
-
+        /* add the instruction to the array*/
         AddInstruction(data, commandIndex, op1, op2, op3);
         data->ic += 4;
         return 1;
     }
 
+    /* command with 2 operands*/
     if (operandNum == 2 && getNOperands(data, 2, op1, op2, op3) == 1 &&
         checkNOperands(data,&instructionInfo, 2, op1, op2, op3) == 1) {
 
+        /* if there was tag before the command*/
         if (thereIsATag(tag)) {
             addTag(data, tag, data->ic, CODE);
         }
-    
+        /* add the instruction to the array*/
         AddInstruction(data, commandIndex, op1, op2, op3);
         data->ic += 4;
         return 1;
     }
 
+    /* command with 3 operands*/
     if (operandNum == 3 && getNOperands(data, 3, op1, op2, op3) == 1 &&
         checkNOperands(data,&instructionInfo, 3, op1, op2, op3) == 1) {
 
         if (thereIsATag(tag)) {
             addTag(data, tag, data->ic, CODE);
         }
+        /* add the instruction to the array*/
         AddInstruction(data, commandIndex, op1, op2, op3);
         data->ic += 4;
         return 1;
@@ -149,12 +159,31 @@ int isItReservedWord(char *command) {
     return 0;
 }
 
+/*----------------------------------------------------------------------------*/
+/*
+ * Description: Checks if the cell contains invalid characters
+ * Input:       command string
+ * Output:		1 if it does 0 if it doesn't
+ */
+/*----------------------------------------------------------------------------*/
+int checkIllegalChars(char *command) {
+    char *p = command;
+    int i;
+
+    for (i = 0; *(p+i) != '\0' ; i++) {
+        if (isalpha(*(p+i)) ==0 ){
+            return 1 ;
+        }
+    }
+    return 0;
+}
+
 
 /*----------------------------------------------------------------------------*/
 /*
- * Description:
- * Input:
- * Output:
+ * Description: Find the InstructionInfo struct, it holds data about the instuction
+ * Input: commandIndex and pointer to instruction structs
+ * Output: 1 if successful, 0 if fails(no command)
  */
 /*----------------------------------------------------------------------------*/
 int getInstructionInfo(int cmdIndex, InstructionInfo *instruction) {
@@ -190,9 +219,10 @@ int getInstructionInfo(int cmdIndex, InstructionInfo *instruction) {
     };
 
     if (cmdIndex < 0 || cmdIndex > NUM_OF_COMMANDS) {
-        return -1;
+        return 0;
     }
 
+    /* fill the data to the info structs*/
     (*instruction).opcode = operandsTypes[cmdIndex].opcode;
     (*instruction).funct = operandsTypes[cmdIndex].funct;
     (*instruction).operandsCount = operandsTypes[cmdIndex].operandsCount;
@@ -201,7 +231,7 @@ int getInstructionInfo(int cmdIndex, InstructionInfo *instruction) {
     (*instruction).operand3Type = operandsTypes[cmdIndex].operand3Type;
     (*instruction).instructionType = operandsTypes[cmdIndex].instructionType;
 
-    return 0;
+    return 1;
 }
 
 
@@ -212,10 +242,11 @@ int getInstructionInfo(int cmdIndex, InstructionInfo *instruction) {
  * Output:		-1 if invalid
  */
 /*----------------------------------------------------------------------------*/
-
 int getOperandType(Data *data, char *operand,int operandNumber) {
 
+    /* hold the error line to print*/
     char errorLine[300];
+
     int isEmpty = isEmptyOperand(operand);
     int isImmediate = isImmediateOperand(data, operand,errorLine);
     int isLabel = isTagOperand(operand);
@@ -479,7 +510,7 @@ int createInstruction_R(Data * data,Instruction *newInstruction,InstructionInfo 
 
 /*----------------------------------------------------------------------------*/
 /*
- * Description:
+ * Description: Create I Instruction
  * Input:
  * Output:
  */
@@ -517,12 +548,12 @@ int createInstruction_I(Data * data,Instruction *newInstruction,InstructionInfo 
 
 /*----------------------------------------------------------------------------*/
 /*
- * Description:
+ * Description: create J instruction
  * Input:
  * Output:
  */
 /*----------------------------------------------------------------------------*/
-int createInstruction_J(Data * data,Instruction *newInstruction,InstructionInfo * instructionInfo,
+int createInstruction_J(Instruction *newInstruction,InstructionInfo * instructionInfo,
                         int op1Address){
 
     if (instructionInfo->opcode == 30){
@@ -560,58 +591,17 @@ int createInstruction_J(Data * data,Instruction *newInstruction,InstructionInfo 
 
 /*----------------------------------------------------------------------------*/
 /*
- * Description:
- * Input:
- * Output:
+ * Description: adds a tag to the tag array inside the Data struct
+ * Input:       pointer to Data struct, tag name pointer, address to point tag at
+ * Output:	    nothing
  */
 /*----------------------------------------------------------------------------*/
-
-
-void updateDataTable(Data *data) {
-    int i;
-    int j;
-    int jump;
-    
-    for (i = 0; i < (data->dc); i++) {
-
-        data->directiveArr[i].icf += data->ic;
-
-        switch (data->directiveArr[i].kind) {
-            case DATA_ASCIZ:
-                            jump = 1;
-                break;
-            case DATA_DB:
-                jump = 1;
-                break;
-            case DATA_DH:
-                jump = 2;
-                break;
-            case DATA_DW:
-                jump = 4;
-                break;
-        }
-
-
-        data->ic += jump - 1;
-        data->dcf += jump;
-    }
-
-
-    for (i = 0; i < data->tc; i++) {
-        j = 0;
-        if (data->tagArr[i].kind == DATA_DH || data->tagArr[i].kind == DATA_DB ||
-            data->tagArr[i].kind == DATA_DW || data->tagArr[i].kind == DATA_ASCIZ) {
-
-            while (i != data->directiveArr[j].tagNumber) {
-                j++;
-            }
-
-            data->tagArr[i].address = data->directiveArr[j].icf;
-
-        }
-    }
-    printf("\n");
-
+void addTag(Data *data, char *tag, int dirAddress, int kind) {
+    data->tagArr = realloc(data->tagArr, sizeof(Tag) * (data->tc + 2));
+    strcpy(data->tagArr[data->tc].name, tag);
+    data->tagArr[data->tc].address = dirAddress;
+    data->tagArr[data->tc].kind = kind;
+    data->tc++;
 }
 
 

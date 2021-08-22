@@ -25,6 +25,11 @@ enum {YES,NO,ERROR,INVALID};
 /*Maximum filename size*/
 #define MAX_FILENAME 50
 
+/* Maximum line holder length*/
+
+#define MAX_LINE_HOLDER_LENGTH 1000
+
+
 /*Number of registers*/
 #define NUM_OF_REGISTERS 32
 

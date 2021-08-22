@@ -7,100 +7,6 @@
 
 #include "header.h"
 
-void printSymbolTable(Data *data) {
-    int i;
-    printf("\n* symbol table * \n");
-    for (i = 0; i < data->tc; i++) {
-        printf("[%s,%d,", data->tagArr[i].name, data->tagArr[i].address);
-        switch (data->tagArr[i].kind) {
-            case CODE:
-                printf("CODE]\n");
-                break;
-            case DATA_DB:
-                printf("DATA_DB]\n");
-                break;
-            case DATA_DH:
-                printf("DATA_DH]\n");
-                break;
-            case DATA_DW:
-                printf("DATA_DW]\n");
-                break;
-            case DATA_ASCIZ:
-                printf("DATA_ASCIZ]\n");
-                break;
-            default:
-                printf("]\n");
-                break;
-        }
-    }
-}
-
-void printInstArr(Data *data) {
-    int i;
-    printf("\n");
-
-    printf("Inst Count: %d  \n", data->ic);
-    for (i = 0; i < ((data->ic) - 100) / 4; i++) {
-        printf("-------------------------\n");
-        printf("ic: %d \n", data->instArr[i].ic);
-        printf("op code: %d \n", data->instArr[i].opcode);
-        printf("funct code: %d \n", data->instArr[i].funct);
-        printf("funct rs: %d \n", data->instArr[i].rs);
-        printf("funct rt: %d \n", data->instArr[i].rt);
-        printf("funct rd: %d \n", data->instArr[i].rd);
-        printf("funct im: %d \n", data->instArr[i].immed);
-        printf("funct address: %d \n", data->instArr[i].address);
-        printf("-------------------------\n");
-    }
-
-}
-
-void printDirectiveArr(Data *data) {
-    int i;
-    printf("DATA COUNT: %d  \n", data->dc);
-    printf("[dataIndex,tagNumber,icf,Kind,Data] ");
-    for (i = 0; i < (data->dc); i++) {
-        printf("[");
-        printf("%d,", i);
-        printf("%d,", data->directiveArr[i].tagNumber);
-        printf("%d,", data->directiveArr[i].icf);
-        switch ((data->directiveArr[i].kind)) {
-            case DATA_ASCIZ:
-                printf("ASCIZ,");
-                break;
-            case DATA_DB:
-                printf("DB,");
-                break;
-            case DATA_DH:
-                printf("DH,");
-                break;
-            case DATA_DW:
-                printf("DW,");
-                break;
-            default:
-                printf(" ,");
-                break;
-        }
-        printf("%d", data->directiveArr[i].data);
-        printf("] ");
-    }
-}
-
-void printEntryArr(Data *data) {
-    int i;
-    printf("\n* EntryArr * \n");
-    for (i = 0; i < data->enc; i++) {
-        printf("[%s]", data->entryArr[i].name);
-    }
-    printf("\n");
-    printf("\n* ExternArrArr * \n");
-    for (i = 0; i < data->exc; i++) {
-        printf("[%s]", data->externArr[i].name);
-    }
-
-}
-
-
 /*----------------------------------------------------------------------------*/
 /*
  * Description: implements the first pass algorithm (from the course booklet)
@@ -109,7 +15,7 @@ void printEntryArr(Data *data) {
  */
 /*----------------------------------------------------------------------------*/
 int firstPassManager(Data *data, FILE *file) {
-    char lineHolder[1000 + 1];
+    char lineHolder[MAX_LINE_HOLDER_LENGTH];
 
     /* NULL means EOF. When we reach EOF it means we're done */
     while (fgets(lineHolder, MAX_LINE_LEN, file) != NULL) {
@@ -118,19 +24,19 @@ int firstPassManager(Data *data, FILE *file) {
         lineHandler(data, file);
     }
 
-        updateDataTable(data);
+    if (data->containError == TRUE) {
+        return 0;
+    }
+
+    /* Update the directive Arr with the right ic address */
+    updateDataTable(data);
     
 
-        printDirectiveArr(data);
+    printDirectiveArr(data);
     printSymbolTable(data);
    /* printInstArr(data);
     printEntryArr(data);
     */
-    
-
-
-
-
 
     return 1;
 }
@@ -155,35 +61,41 @@ int lineHandler(Data *data, FILE *file) {
         return 1;
     }
 
-    getTag(data, tag);
-
     /* there's a tag at the start of the line */
-    if (*tag != '\0') {
+    if (getTag(data, tag) == 1) {
         if (strlen(tag) > 31 ){
             printf("[Error] on line %d: label cant be longer than %d chars\n", data->lc, MAX_TAG_LEN );
+            eatLine(data);
             data->containError = TRUE;
             return 0;
         }
         if (isdigit(*tag)){
             printf("[Error] on line %d: label can not start with number\n", data->lc);
+            eatLine(data);
             data->containError = TRUE;
             return 0;
         }
         if (isItReservedWord(tag) == 1){
             printf("[Error] on line %d: label can not be saved word\n", data->lc);
+            eatLine(data);
+            data->containError = TRUE;
+            return 0;
+        }
+        if (checkIllegalChars(tag) == 1){
+            printf("[Error] on line %d: label contains invalid characters\n", data->lc);
+            eatLine(data);
             data->containError = TRUE;
             return 0;
         }
 
         if (tagDupCheck(data, tag) == 1) {
             printf("[Error] on line %d: you have the tag %s more then once.\n", data->lc, tag);
+            eatLine(data);
             data->containError = TRUE;
             return 0;
         }
         eatSpace(data);
     }
-
-
 
     if (*(data->line) == '.') {
         return directivesManager(data, tag, FIRST_PASS);
@@ -240,15 +152,55 @@ int tagDupCheck(Data *data, char *tag) {
 
 /*----------------------------------------------------------------------------*/
 /*
- * Description: adds a tag to the tag array inside the Data struct
- * Input:       pointer to Data struct, tag name pointer, address to point tag at
- * Output:	    nothing
+ * Description: After the first pass, update the ic address for each directive
+ * Input: Pointer to the data structs
+ * Output: Nothing
  */
 /*----------------------------------------------------------------------------*/
-void addTag(Data *data, char *tag, int dirAddress, int kind) {
-    data->tagArr = realloc(data->tagArr, sizeof(Tag) * (data->tc + 2));
-    strcpy(data->tagArr[data->tc].name, tag);
-    data->tagArr[data->tc].address = dirAddress;
-    data->tagArr[data->tc].kind = kind;
-    data->tc++;
+void updateDataTable(Data *data) {
+    int i;
+    int j;
+    int jump;
+
+    for (i = 0; i < (data->dc); i++) {
+        /* give the final ic address for each directive*/
+        data->directiveArr[i].icf += data->ic;
+
+        /* increase the total ic */
+        switch (data->directiveArr[i].kind) {
+            case DATA_ASCIZ:
+                jump = 1;
+                break;
+            case DATA_DB:
+                jump = 1;
+                break;
+            case DATA_DH:
+                jump = 2;
+                break;
+            case DATA_DW:
+                jump = 4;
+                break;
+        }
+
+        data->ic += jump - 1;
+
+        /* increasing the total length of the data images*/
+        data->dcf += jump;
+    }
+
+    /* update the right ic address in the symbol table*/
+    for (i = 0; i < data->tc; i++) {
+        j = 0;
+        if (data->tagArr[i].kind == DATA_DH || data->tagArr[i].kind == DATA_DB ||
+            data->tagArr[i].kind == DATA_DW || data->tagArr[i].kind == DATA_ASCIZ) {
+
+            while (i != data->directiveArr[j].tagNumber) {
+                j++;
+            }
+
+            data->tagArr[i].address = data->directiveArr[j].icf;
+
+        }
+    }
+
 }

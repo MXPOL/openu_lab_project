@@ -91,17 +91,21 @@ void initializeData(Data *data) {
 /*----------------------------------------------------------------------------*/
 void setDataFree(Data * data){
     int i;
-    /* free all the data in the data struct */
+    /* free all the tags in the data struct */
     free(data->tagArr);
+    /* free all the data in the data struct */
     free(data->directiveArr);
-
+    /* free all the entry words in the data struct */
     free(data->entryArr);
 
+    /*free all the extern arr address*/
     for (i = 0 ; i < data->exc ; i++){
         free(data->externArr[i].icArr);
     }
 
+    /* free all the extern words */
     free(data->externArr);
-    free(data->instArr);
 
+    /* free instructions in the data struct */
+    free(data->instArr);
 }
