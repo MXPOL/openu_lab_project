@@ -47,8 +47,6 @@ int getTag(Data * data,char * tagGet);
 int lineEmptyCheck(Data * data);
 void eatLine(FILE * fp);
 void eatSpace(Data * data);
-void substring(char* stringTo,char* stringFrom,int length);
-int checkLetterOrNumber(char c);
 int checkLetters(char c);
 int checkUpperCase(char c);
 int checkInLimit(char c,int startLimit,int length);
@@ -72,10 +70,7 @@ void addExtern(Data * data, char * tag);
 int firstPassCommandsManager(Data * data, char * tag);
 int getCommandIndex(char* command);
 int isItReservedWord(char *command);
-int getNumOfOperands(int cmdIndex);
-char * getOneOperands(Data * data, char * tag,int kind);
 int getOperandType(Data *data, char *operand,int operandNumber);
-int getAddressingMethod(Data * data, char * operand);
 int isRegisterOperand(char *operan,char * errorLine);
 int isEmptyOperand(char * operand);
 int getRegisterIndex(char * operand);
@@ -114,35 +109,28 @@ int recordExternal(Data * data, int externalIndex);
 /* output manager */
 void outputManager(Data * data, char *);
 void writeLengthsToFile(Data * data, char * filename);
+void writeInstructionToFile(Data *data,char* outputFileName);
 void writeExternToFile(Data * data,char * filename);
 void writeEntryToFile(Data * data,char * filename);
-
-char* decimalToBase32(unsigned long int decNum);
-char *decimalToBinary(int number, int bits);
-void createOutputZeroExtra(Data * , char * , int);
+void writeDirectivesToFile(Data * data,char * outputFileName);
 void writeToOutputFile(char * output,char *);
 char *decimal_to_binary(int number, int bits);
-void create_R_Instruction(Data * data, char * filename,int instructionIndex, Instruction *instruction);
-void create_I_Instruction(Data * data, char * filename,int instructionIndex, Instruction *instruction);
-void create_J_Instruction(Data * data, char * filename,int instructionIndex, Instruction *instruction);
-int binary2decimal(char * bin);
+void print_R_Instruction(char * filename,int instructionIndex, Instruction *instruction);
+void print_I_Instruction(char * filename,int instructionIndex, Instruction *instruction);
+void print_J_Instruction(char * filename,int instructionIndex, Instruction *instruction);
+char * littleEndian16BitsFormat ( char *stringBits);
+char * littleEndian32BitsFormat ( char *stringBits);
+char *binaryToHex(char *binary, int length);
+char *padBinary(char *binary, int length);
+char valueOf(char *halfByte);
+char * littleEn (char * binary,int length );
+
 
 /* dev func*/
 
 void printInstArr (Data * data);
 
 /* */
-char *binaryToHex(char *binary, int length);
-char *padBinary(char *binary, int length);
-int validate(char *hex, int length);
-char valueOf(char *halfByte);
-char * littleEn (char * binary,int length );
-void writeData (char * binary,int length);
-char * fix16bits ( char * binary);
-char * littleEnStyle (char * binary);
-char * fix16 ( char *stringBits);
-char * fix32 ( char *stringBits);
-
 
 /* remove in the end */
 void printEntryArr(Data *data);

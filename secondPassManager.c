@@ -21,7 +21,7 @@ void secondPassManager( Data * data, FILE *file){
     char lineHolder[MAX_LINE_LEN+1];
 
     /* NULL means EOF. When we reach EOF it means we're done */
-    while(fgets(lineHolder,MAX_LINE_LEN,file) != NULL ){
+    while(fgets(lineHolder,MAX_LINE_LEN+1,file) != NULL ){
         data->line=lineHolder;
         if(lineHandlerSecondPass(data,file)==0){
             printf("[Error] on line %d: Fatal Error, continuing to next file if exists\n",data->lc);
@@ -46,6 +46,10 @@ int lineHandlerSecondPass(Data * data, FILE * file){
     char tag[MAX_LINE_LEN + 1 ] = { 0 };
     int i;
 
+    if (lineLengthCheck(data, file) == 0) {
+        return 1;
+    }
+
     if(lineEmptyCheck(data)==1){
         return 1;
     }
@@ -54,8 +58,8 @@ int lineHandlerSecondPass(Data * data, FILE * file){
     }
 
     /*should do nothing if there's a tag at the start of the line*/
-    getTag(data,tag);
-    if (*tag != '\0'){
+
+    if (getTag(data, tag) == 1) {
         eatSpace(data);
     }
 

@@ -18,7 +18,7 @@ int firstPassManager(Data *data, FILE *file) {
     char lineHolder[MAX_LINE_HOLDER_LENGTH];
 
     /* NULL means EOF. When we reach EOF it means we're done */
-    while (fgets(lineHolder, MAX_LINE_LEN, file) != NULL) {
+    while (fgets(lineHolder, MAX_LINE_LEN + 1, file) != NULL) {
         data->line = lineHolder;
         data->lc++;
         lineHandler(data, file);
@@ -65,25 +65,22 @@ int lineHandler(Data *data, FILE *file) {
     if (getTag(data, tag) == 1) {
         if (strlen(tag) > 31 ){
             printf("[Error] on line %d: label cant be longer than %d chars\n", data->lc, MAX_TAG_LEN );
-            eatLine(data);
             data->containError = TRUE;
             return 0;
         }
         if (isdigit(*tag)){
             printf("[Error] on line %d: label can not start with number\n", data->lc);
-            eatLine(data);
             data->containError = TRUE;
             return 0;
         }
         if (isItReservedWord(tag) == 1){
             printf("[Error] on line %d: label can not be saved word\n", data->lc);
-            eatLine(data);
+
             data->containError = TRUE;
             return 0;
         }
         if (checkIllegalChars(tag) == 1){
             printf("[Error] on line %d: label contains invalid characters\n", data->lc);
-            eatLine(data);
             data->containError = TRUE;
             return 0;
         }

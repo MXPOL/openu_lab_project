@@ -14,7 +14,7 @@ enum {YES,NO,ERROR,INVALID};
 
 
 /*Maximum line buffer size*/
-#define MAX_LINE_LEN 81
+#define MAX_LINE_LEN 80
 /* maximum length of a tag is 31 */
 #define MAX_TAG_LEN 31
 /* maximum length of command*/
