@@ -11,8 +11,6 @@ enum {YES,NO,ERROR,INVALID};
 
 #define LABEL_NOT_FOUND -1
 
-
-
 /*Maximum line buffer size*/
 #define MAX_LINE_LEN 80
 /* maximum length of a tag is 31 */
@@ -69,65 +67,16 @@ enum INSTRUCTION_TYPE {TYPE_R,TYPE_I,TYPE_J};
 #define FIRST_CAPITAL_LETTER_ASCII 65
 #define FIRST_LOWER_LETTER_ASCII 97
 
-/*Extrnsions for file i/o*/
-#define AS_EXTENSION ".as"
-#define TXT_EXTENSION ".txt"
-#define OB_EXTENSION ".ob"
-#define ENT_EXTENSION ".ent"
-#define EXT_EXTENSION ".ext"
-
-
 /*Amoount of opcodes*/
-#define OPCODES_AMOUNT 27
 #define NUM_OF_COMMANDS 27
 #define NUM_OF_RESERVED_WORD 33
-
-/*Opcodes*/
-#define OPCODE_MOVE 1
-#define OPCODE_MVHI 1
-#define OPCODE_MVLO 12
-#define OPCODE_ADDI 10
-#define OPCODE_SUBI 11
-#define OPCODE_ANDI 12
-#define OPCODE_ORI 13
-#define OPCODE_NORI 14
-#define OPCODE_BNE 15
-#define OPCODE_BEQ 16
-#define OPCODE_BTL 17
-#define OPCODE_BGT 18
-#define OPCODE_LB 19
-#define OPCODE_SB 20
-#define OPCODE_LW 21
-#define OPCODE_SW 22
-#define OPCODE_LH 23
-#define OPCODE_SH 24
-#define OPCODE_JMP 30
-#define OPCODE_LA 31
-#define OPCODE_CALL 32
-#define OPCODE_STOP 63
-
-/*Funct*/
-#define FUNCT_ADD 1
-#define FUNCT_SUB 2
-#define FUNCT_AND 3
-#define FUNCT_OR 4
-#define FUNCT_NOR 5
-#define FUNCT_MOVE 1
-#define FUNCT_MVHI 2
-#define FUNCT_MVLO 3
-
-/* addressing methods */
-
-#define EMPTY_OPERAND -1
-#define TAG_OPERAND 12
-#define REGISTER_OPERAND 10
-#define IMMEDIATE_OPERAND 11
 
 /* operands types */
 #define REGISTER 10
 #define IMMEDIATE 11
 #define LABEL 12
 #define EMPTY -1
+#define EMPTY_OPERAND -1
 
 #define REGISTER_IMMEDIATE 13
 #define REGISTER_LABEL 14

@@ -126,11 +126,11 @@ char valueOf(char *halfByte);
 char * littleEn (char * binary,int length );
 
 
+/* */
+
 /* dev func*/
 
 void printInstArr (Data * data);
-
-/* */
 
 /* remove in the end */
 void printEntryArr(Data *data);

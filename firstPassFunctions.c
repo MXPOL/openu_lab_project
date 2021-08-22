@@ -327,6 +327,13 @@ int AddInstruction(Data *data, int commandIndex, char *operand1, char *operand2,
         case TYPE_R:
             return createInstruction_R(data, instruction, &info, op1Address, op2Address, op3Address);
         case TYPE_I:
+            if( op3Address == LABEL_NOT_FOUND ) {
+                if (getItExternTagAddress(data, operand3) != -1) {
+                    printf("[Error] on line %d: The tag cannot be external2\n", data->lc);
+                    data->containError = TRUE;
+                    return 0;
+                }
+            }
             return createInstruction_I(data, instruction, &info, op1Address, op2Address, op3Address);
         case TYPE_J:
             return createInstruction_J(instruction, &info, op1Address);

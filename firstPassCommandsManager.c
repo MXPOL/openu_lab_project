@@ -518,6 +518,8 @@ int createInstruction_R(Data * data,Instruction *newInstruction,InstructionInfo 
 int createInstruction_I(Data * data,Instruction *newInstruction,InstructionInfo * instructionInfo,
                         int op1Address, int op2Address, int op3Address){
 
+
+
     if (instructionInfo->opcode>9 && instructionInfo->opcode<14){
         newInstruction->opcode = instructionInfo->opcode;
         newInstruction->funct = 0;

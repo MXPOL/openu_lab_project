@@ -44,13 +44,6 @@ typedef struct{
 } Tag;
 
 typedef struct{
-    char name[MAX_TAG_LEN];
-    int value;
-    int external;
-    int attribute;
-} Symbol;
-
-typedef struct{
     int tagNumber;
     int icf;
     int data;

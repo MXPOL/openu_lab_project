@@ -9,7 +9,6 @@
 #include "header.h"
 
 
-
 /*----------------------------------------------------------------------------*/
 /*
  * Description: implements the second pass algorithm (from the course booklet)
@@ -29,10 +28,6 @@ void secondPassManager( Data * data, FILE *file){
         }
         data->lc++;
     }
-
-
-
-    /*printInstArr(data);*/
 }
 
 /*----------------------------------------------------------------------------*/

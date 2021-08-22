@@ -68,12 +68,11 @@ void print_R_Instruction( char * filename,int instructionIndex, Instruction *ins
 
     hexString = littleEn(buf,strlen(buf));
 
-    free(hexString);
-
     snprintf(buf, sizeof(buf), "%d\t%s", instructionIndex,hexString);
 
     writeToOutputFile(buf, filename);
 
+    free(hexString);
     free(opcode);
     free(rs);
     free(rt);

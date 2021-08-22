@@ -30,13 +30,6 @@ int firstPassManager(Data *data, FILE *file) {
 
     /* Update the directive Arr with the right ic address */
     updateDataTable(data);
-    
-
-    printDirectiveArr(data);
-    printSymbolTable(data);
-   /* printInstArr(data);
-    printEntryArr(data);
-    */
 
     return 1;
 }
@@ -87,7 +80,6 @@ int lineHandler(Data *data, FILE *file) {
 
         if (tagDupCheck(data, tag) == 1) {
             printf("[Error] on line %d: you have the tag %s more then once.\n", data->lc, tag);
-            eatLine(data);
             data->containError = TRUE;
             return 0;
         }
