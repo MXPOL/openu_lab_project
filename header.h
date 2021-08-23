@@ -20,12 +20,6 @@
 
 /*-------------------------------------------*/
 
-#define EXIT 0
-#define GET_NUMBER 1
-#define GET_COMMA 2
-
-#define NUM_OF_COMMANDS 27
-
 /*  passManager function declarations*/
 int passManager(FILE *file, char *);
 void setDataFree(Data *data);

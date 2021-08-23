@@ -24,8 +24,12 @@ enum {YES,NO,ERROR,INVALID};
 #define MAX_FILENAME 50
 
 /* Maximum line holder length*/
-
 #define MAX_LINE_HOLDER_LENGTH 1000
+
+/* state in getting directives*/
+#define EXIT 0
+#define GET_NUMBER 1
+#define GET_COMMA 2
 
 
 /*Number of registers*/

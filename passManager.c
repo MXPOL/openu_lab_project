@@ -36,8 +36,6 @@ int passManager(FILE *file, char *filename) {
     /* reset line counter to 0 */
     data.lc = 1;
 
-    printf("\n");
-
     /* go over the code for a second time*/
     secondPassManager(&data,file);
 
