@@ -16,11 +16,14 @@
 /*----------------------------------------------------------------------------*/
 
 void outputManager(Data * data, char * filename){
+    size_t len = strlen(filename);
     char JustfileName[MAX_FILENAME +1];
     char outputFileName[MAX_FILENAME+1];
 
     /* save the file name without extentions */
     strncpy(JustfileName,filename,strlen(filename)- 3);
+    JustfileName[len - 3] = 0;
+
     /* creating filename for ob file*/
     strcpy(outputFileName,JustfileName);
     strcat(outputFileName, ".ob");
