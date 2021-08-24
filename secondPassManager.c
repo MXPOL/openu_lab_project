@@ -39,7 +39,6 @@ void secondPassManager( Data * data, FILE *file){
 /*----------------------------------------------------------------------------*/
 int lineHandlerSecondPass(Data * data, FILE * file){
     char tag[MAX_LINE_LEN + 1 ] = { 0 };
-    int i;
 
     if (lineLengthCheck(data, file) == 0) {
         return 1;

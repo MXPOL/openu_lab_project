@@ -187,7 +187,7 @@ int checkIllegalChars(char *command) {
  */
 /*----------------------------------------------------------------------------*/
 int getInstructionInfo(int cmdIndex, InstructionInfo *instruction) {
-    int i;
+    
     InstructionInfo operandsTypes[NUM_OF_COMMANDS] = {
             {0, 1,               3, REGISTER,         REGISTER,         REGISTER,         TYPE_R},
             {0, 2,               3, REGISTER,         REGISTER,         REGISTER,         TYPE_R},
@@ -517,8 +517,6 @@ int createInstruction_R(Data * data,Instruction *newInstruction,InstructionInfo 
 /*----------------------------------------------------------------------------*/
 int createInstruction_I(Data * data,Instruction *newInstruction,InstructionInfo * instructionInfo,
                         int op1Address, int op2Address, int op3Address){
-
-
 
     if (instructionInfo->opcode>9 && instructionInfo->opcode<14){
         newInstruction->opcode = instructionInfo->opcode;

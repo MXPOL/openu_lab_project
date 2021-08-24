@@ -12,25 +12,30 @@
  * Description: generates the output file and writes the code into them
  * Input:       Data struct
  * Output:		nothing
- * /
+ */
 /*----------------------------------------------------------------------------*/
 
 void outputManager(Data * data, char * filename){
+    char JustfileName[MAX_FILENAME +1];
     char outputFileName[MAX_FILENAME+1];
 
-    strcpy(outputFileName,filename);
+    /* save the file name without extentions */
+    strncpy(JustfileName,filename,strlen(filename)- 3);
+    /* creating filename for ob file*/
+    strcpy(outputFileName,JustfileName);
     strcat(outputFileName, ".ob");
 
 
     /* write the instruction and data lengths to file */
-    writeLengthsToFile(data, outputFileName);
 
-    writeInstructionToFile(data,outputFileName);
-
-    writeDirectivesToFile(data,outputFileName);
+    if (data -> ic > 100){
+        writeLengthsToFile(data, outputFileName);
+        writeInstructionToFile(data,outputFileName);
+        writeDirectivesToFile(data,outputFileName);
+    }
 
     /* remove the .ob extension */
-    strcpy(outputFileName,filename);
+    strcpy(outputFileName,JustfileName);
 
     if(data->exc>0){
         strcat(outputFileName, ".ext");
@@ -38,7 +43,7 @@ void outputManager(Data * data, char * filename){
     }
 
     /* remove the .ext extension */
-    strcpy(outputFileName,filename);
+    strcpy(outputFileName,JustfileName);
 
     if(data->enc>0){
         strcat(outputFileName, ".ent");
@@ -479,6 +484,7 @@ char * littleEndian32BitsFormat ( char *stringBits){
  * Description: converts binary string to hex string
  * Input:       bits string array , length of the bits string
  * Output:		pointer to the hex string
+ */
 /*----------------------------------------------------------------------------*/
 char* binaryToHex(char *binary, int length)
 {
@@ -516,6 +522,7 @@ char* binaryToHex(char *binary, int length)
  * Description: padding the bits string array
  * Input:       bits string array , length of the bits string
  * Output:		padded string
+ * */
 /*----------------------------------------------------------------------------*/
 char *padBinary(char *binary, int length)
 {
@@ -542,6 +549,7 @@ char *padBinary(char *binary, int length)
  * Description: translate 4 bits to hex digit
  * Input:       4 bits as string
  * Output:		nothing
+ * */
 /*----------------------------------------------------------------------------*/
 char valueOf(char *halfByte)
 {
@@ -585,6 +593,7 @@ char valueOf(char *halfByte)
  * Description: prints the hex number as little endian format
  * Input:       bits string, length of the bits string
  * Output:		nothing
+ * */
 /*----------------------------------------------------------------------------*/
 char * littleEn (char * binary,int length){
     int i;

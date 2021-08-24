@@ -299,6 +299,8 @@ int getAddress(Data *data, char *operand, int type) {
         case OPERAND_NOT_USED:
             return 0;
     }
+
+    return 0;
 }
 
 
@@ -313,12 +315,15 @@ int AddInstruction(Data *data, int commandIndex, char *operand1, char *operand2,
     Instruction *instruction;
     InstructionInfo info;
     int currentIC;
+    int op1Address;
+    int op2Address;
+    int op3Address;
 
     getInstructionInfo(commandIndex, &info);
 
-    int op1Address = getAddress(data, operand1, info.operand1Type);
-    int op2Address = getAddress(data, operand2, info.operand2Type);
-    int op3Address = getAddress(data, operand3, info.operand3Type);
+    op1Address = getAddress(data, operand1, info.operand1Type);
+    op2Address = getAddress(data, operand2, info.operand2Type);
+    op3Address = getAddress(data, operand3, info.operand3Type);
 
     currentIC = ((data->ic - 100) / 4);
     data->instArr = realloc(data->instArr, sizeof(Instruction) * (currentIC + 1));
@@ -342,6 +347,8 @@ int AddInstruction(Data *data, int commandIndex, char *operand1, char *operand2,
         case TYPE_J:
             return createInstruction_J(instruction, &info, op1Address);
     }
+
+    return 0;
 }
 
 

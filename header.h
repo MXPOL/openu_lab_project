@@ -12,6 +12,7 @@
 #include <ctype.h>
 
 
+
 /*data structures */
 #include "structs.h"
 
@@ -119,19 +120,8 @@ char *binaryToHex(char *binary, int length);
 char *padBinary(char *binary, int length);
 char valueOf(char *halfByte);
 char * littleEn (char * binary,int length );
-
-
-/* */
-
-/* dev func*/
-
-void printInstArr (Data * data);
-
-/* remove in the end */
-void printEntryArr(Data *data);
-void printDirectiveArr(Data *data);
-void printInstArr(Data *data);
-void printSymbolTable(Data *data);
+int snprintf (char *__restrict __s, size_t __maxlen,
+		     const char *__restrict __format, ...);
 
 
 

@@ -61,6 +61,7 @@ int directivesManager(Data *data, char *tag, int whatPass) {
         return 1;
     }
 
+    return 0;
 
 }
 

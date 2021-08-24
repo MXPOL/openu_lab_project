@@ -14,7 +14,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-
     /*go through the file names array*/
     /* there's no check if the user entered a name with an extension, i.e because
      * (e.g) tuna.as.as is a valid filname */
@@ -27,8 +26,6 @@ int main(int argc, char *argv[]) {
         /* copy the file name to a bigger char array so we could add the ".asm"
          * suffix to the name */
         strcpy(filename, argv[i]);
-        /* add the ".as" suffix */
-        strcat(filename, ".as");
         /* open the file in read mode */
         fp = fopen(filename, "r");
         /* check if file was opened successfully (i.e if it exists); */

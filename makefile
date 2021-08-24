@@ -1,5 +1,5 @@
-maman14: main.o passManager.o firstPass.o commonFuncs.o directivesManager.o firstPassCommandsManager.o firstPassFunctions.o	outputManager.o secondPassManager.o secondPassCommandManager.o hexFunctions.o
-	gcc   -Wall -ansi -pedantic main.o commonFuncs.o passManager.o firstPass.o directivesManager.o firstPassCommandsManager.o firstPassFunctions.o	outputManager.o secondPassManager.o secondPassCommandManager.o  hexFunctions.o -o maman14
+maman14: main.o passManager.o firstPass.o commonFuncs.o directivesManager.o firstPassCommandsManager.o firstPassFunctions.o	outputManager.o secondPassManager.o secondPassCommandManager.o 
+	gcc   -Wall -ansi -pedantic main.o commonFuncs.o passManager.o firstPass.o directivesManager.o firstPassCommandsManager.o firstPassFunctions.o	outputManager.o secondPassManager.o secondPassCommandManager.o  -o maman14
 
 main.o:	main.c
 	gcc  -c -Wall -ansi -pedantic main.c -o main.o
@@ -31,5 +31,3 @@ secondPassManager.o:	secondPassManager.c
 secondPassCommandManager.o:	secondPassCommandManager.c
 	gcc  -c -Wall -ansi -pedantic secondPassCommandManager.c -o secondPassCommandManager.o
 
-hexFunctions.o:	hexFunctions.c
-	gcc  -c -Wall -ansi -pedantic hexFunctions.c -o hexFunctions.o

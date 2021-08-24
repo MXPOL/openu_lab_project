@@ -73,11 +73,16 @@ int secondPassCommandHandler(Data * data, int commandIndex, char * operand1,char
 /*----------------------------------------------------------------------------*/
 int instruction_I_Handler(Data * data, int commandIndex, Instruction *instruction, char * operand1,char* operand2,char *operand3) {
     InstructionInfo info;
+    int op1Address;
+    int op2Address;
+    int op3Address;
+
+
     getInstructionInfo(commandIndex,&info);
 
-    int op1Address = getAddress(data,operand1,info.operand1Type);
-    int op2Address = getAddress(data,operand2,info.operand2Type);
-    int op3Address = getAddress(data,operand3,info.operand3Type);
+    op1Address = getAddress(data,operand1,info.operand1Type);
+    op2Address = getAddress(data,operand2,info.operand2Type);
+    op3Address = getAddress(data,operand3,info.operand3Type);
 
     /* The tag is not in the entry list */
     if( op3Address == LABEL_NOT_FOUND ){
@@ -98,6 +103,7 @@ int instruction_I_Handler(Data * data, int commandIndex, Instruction *instructio
         instruction->rs = op1Address;
         instruction->rt = op3Address;
         instruction->immed = op2Address;
+        return 1;
     }
     if (info.opcode>13 && info.opcode<19) {
         instruction->opcode = info.opcode;
@@ -105,6 +111,7 @@ int instruction_I_Handler(Data * data, int commandIndex, Instruction *instructio
         instruction->rs = op1Address;
         instruction->rt = op2Address;
         instruction->immed = op3Address - data->ic;
+        return 1;
     }
     if (info.opcode>18 && info.opcode<25) {
         instruction->opcode = info.opcode;
@@ -112,7 +119,11 @@ int instruction_I_Handler(Data * data, int commandIndex, Instruction *instructio
         instruction->rs = op1Address;
         instruction->immed = op2Address;
         instruction->rt = op3Address;
+
+        return 1;
     }
+
+    return 1;
 }
 
 
@@ -126,9 +137,12 @@ int instruction_I_Handler(Data * data, int commandIndex, Instruction *instructio
 int instruction_J_Handler(Data * data, int commandIndex, Instruction *instruction, char * operand1) {
 
     InstructionInfo info;
+    int op1Address;
     int externalIndex = -2 ;
     getInstructionInfo(commandIndex,&info);
-    int op1Address = getAddress(data,operand1,info.operand1Type);
+
+
+    op1Address = getAddress(data,operand1,info.operand1Type);
 
     if (op1Address == -1){
         externalIndex = getItExternTagAddress(data,operand1);
@@ -147,18 +161,21 @@ int instruction_J_Handler(Data * data, int commandIndex, Instruction *instructio
         instruction->funct = 0;
         instruction->reg = op1Address < 32 ? 1 : 0;
         instruction->address = op1Address != -1 ? op1Address : -1;
+        return 1;
     }
     if (info.opcode == 31){
         instruction->opcode = info.opcode;
         instruction->funct = 0;
         instruction->reg = 0;
         instruction->address = op1Address != -1 ? op1Address : -1;
+        return 1;
     }
     if (info.opcode == 32){
         instruction->opcode = info.opcode;
         instruction->funct = 0;
         instruction->reg = 0;
         instruction->address = op1Address != -1 ? op1Address : -1;
+        return 1;
     }
     if (info.opcode == 63){
 
@@ -166,7 +183,10 @@ int instruction_J_Handler(Data * data, int commandIndex, Instruction *instructio
         instruction->funct = 0;
         instruction->reg = 0;
         instruction->address = 0;
+        return 1;
     }
+
+    return 1;
 
 }
 
