@@ -394,7 +394,7 @@ int entryDirectiveHandlerSecondPass(Data *data) {
     getTagOperand(data, tagName);
 
     for (i = 0; i <= (data->tc); i++) {
-        if ( strcmp(data->tagArr[i].name,tagName) ==0 ) {
+        if (data->tagArr!=NULL && strcmp(data->tagArr[i].name,tagName) ==0 ) {
             tagIndex = i;
             data->tagArr[i].entry = 1;
         }

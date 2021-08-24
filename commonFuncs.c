@@ -56,22 +56,7 @@ void eatLine(FILE * fp) {
 
 void deleteSpaces(char* input)
 {
-    /*
-
-    int endOfString = strlen(input) - 1;
-    char * tempStr =  (char*) malloc (strlen(input));
-    strcpy(tempStr,input);
-
-    while (input[endOfString]== ' '){
-        endOfString--;
-    }
-
-    *(tempStr + endOfString + 1 ) ='\0';
-    strcpy(input,tempStr);
-    free(tempStr);
-    */
 }
-
 
 /*----------------------------------------------------------------------------*/
 /*
@@ -208,7 +193,7 @@ int lineCommentCheck(Data * data){
 
 /*----------------------------------------------------------------------------*/
 /*
- * Description: get the tag from beggining of a line
+ * Description: get the tag from beginning of a line
  * Input:       pointer to Data struct, pointer to a character array
  * Output:      1 if tag was received , 0 otherwise, tagGet holds the tag if 1.
  */
@@ -258,12 +243,30 @@ void stringRemoveNonAlphaNum(char *str)
 
 }
 
+void removeSpaceFromEnd(char *str)
+{
+    const char* strPointer = str;
+    char* endOfString;
+    size_t len;
 
+    if (str[0] == '\0') {
+        return;
+    }
+    len = strlen(strPointer) + 1;
+    endOfString = str + len;
+
+    while(str < endOfString && (isspace(*endOfString) || *endOfString == '\0')) {
+        --endOfString ;
+    }
+
+    *(endOfString + 1) = '\0';
+
+}
 
 
 /*----------------------------------------------------------------------------*/
 /*
- * Description: get the tag from NOT begginig of the line
+ * Description: get the tag from NOT begging of the line
  * Input:       pointer to Data struct, pointer to a character array
  * Output:	    if tag is found tagGet will hold the tag, tagGet will be NULL otherwise
  */
@@ -276,12 +279,3 @@ void getTagOperand(Data * data, char * tagGet){
     stringRemoveNonAlphaNum(c);
     strcpy(tagGet,tag);
 }
-
-/*----------------------------------------------------------------------------*/
-/*
- * Description: get the tag from NOT begginig of the line
- * Input:       pointer to Data struct, pointer to a character array
- * Output:	    if tag is found tagGet will hold the tag, tagGet will be NULL otherwise
- */
-/*----------------------------------------------------------------------------*/
-

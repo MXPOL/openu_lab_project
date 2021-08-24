@@ -41,8 +41,8 @@ int secondPassCommandManager(Data * data){
 
 /*----------------------------------------------------------------------------*/
 /*
- * Description: handles commands with no operands
- * Input:       Data struct, command string
+ * Description: Second Pass Command Handler
+ * Input:       Data struct, command index, operand1, operand2, operand3
  * Output:		1 if no errors are found, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
@@ -66,8 +66,8 @@ int secondPassCommandHandler(Data * data, int commandIndex, char * operand1,char
 
 /*----------------------------------------------------------------------------*/
 /*
- * Description: handles commands with no operands
- * Input:       Data struct, command string
+ * Description: Handle instruction I in the second pass
+ * Input:       Data struct, command index, operand1, operand2, operand3
  * Output:		1 if no errors are found, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
@@ -118,8 +118,8 @@ int instruction_I_Handler(Data * data, int commandIndex, Instruction *instructio
 
 /*----------------------------------------------------------------------------*/
 /*
- * Description: handles commands with no operands
- * Input:       Data struct, command string
+ * Description: Handle instruction J in the second pass
+ * Input:       Data struct, command index, operand1, operand2, operand3
  * Output:		1 if no errors are found, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
@@ -171,6 +171,13 @@ int instruction_J_Handler(Data * data, int commandIndex, Instruction *instructio
 }
 
 
+/*----------------------------------------------------------------------------*/
+/*
+ * Description: Record the occurrences of external variables to print them later
+ * Input:       Data struct, external index in the data extern array
+ * Output:		1 if no errors are found, 0 otherwise
+ */
+/*----------------------------------------------------------------------------*/
 int recordExternal(Data * data, int externalIndex) {
     if ( data->externArr[externalIndex].appearance == 0){
         data->externArr[externalIndex].icArr = (int *)malloc(sizeof(int));

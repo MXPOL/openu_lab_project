@@ -12,7 +12,9 @@
  * Description: generates the output file and writes the code into them
  * Input:       Data struct
  * Output:		nothing
+ * /
 /*----------------------------------------------------------------------------*/
+
 void outputManager(Data * data, char * filename){
     char outputFileName[MAX_FILENAME+1];
 
@@ -48,7 +50,7 @@ void outputManager(Data * data, char * filename){
 
 /*----------------------------------------------------------------------------*/
 /*
- * Description: generates the output file for an instruction with no extra words
+ * Description: generates the output string for R instruction with no extra words
  * Input:       Data struct, filename string
  * Output:		nothing
  */
@@ -370,6 +372,7 @@ void writeDirectivesToFile(Data * data,char * outputFileName) {
     /* save the buff address for free function in the end*/
     tempPointer = buff;
 
+    /* Takes 32 chunk from the buff string convert them to hex and print them to file */
     for(i = 0 ; i < bitsCount / 32 ; i++ ){
         strncpy( temp, buff , 32);
         temp[33] = '\0';
@@ -382,11 +385,15 @@ void writeDirectivesToFile(Data * data,char * outputFileName) {
 
     }
 
-    strncpy( temp, buff , bitsCount%32);
-    temp[bitsCount%32] = '\0';
-    hexString = binaryToHex(temp, strlen(temp) - 1);
-    snprintf(line, sizeof(line), "%d\t%s", data->ic,hexString);
-    writeToOutputFile(line, outputFileName);
+    /* Checks if unprinted bits remain */
+    if (bitsCount % 32 != 0){
+        strncpy( temp, buff , bitsCount%32);
+        temp[bitsCount%32] = '\0';
+        hexString = binaryToHex(temp, strlen(temp) - 1);
+        snprintf(line, sizeof(line), "%d\t%s", data->ic,hexString);
+        writeToOutputFile(line, outputFileName);
+    }
+
 
     /* free buff string array*/
     free(tempPointer);
@@ -433,7 +440,6 @@ char * littleEndian16BitsFormat ( char *stringBits){
  * Output:		little endian 32 bits string
  */
 /*----------------------------------------------------------------------------*/
-
 char * littleEndian32BitsFormat ( char *stringBits){
     char *fixedBitsStr;
     int i;
@@ -468,8 +474,13 @@ char * littleEndian32BitsFormat ( char *stringBits){
 
 }
 
-
-char *binaryToHex(char *binary, int length)
+/*----------------------------------------------------------------------------*/
+/*
+ * Description: converts binary string to hex string
+ * Input:       bits string array , length of the bits string
+ * Output:		pointer to the hex string
+/*----------------------------------------------------------------------------*/
+char* binaryToHex(char *binary, int length)
 {
     int i;
     char *hex;
@@ -500,6 +511,12 @@ char *binaryToHex(char *binary, int length)
     return hex;
 }
 
+/*----------------------------------------------------------------------------*/
+/*
+ * Description: padding the bits string array
+ * Input:       bits string array , length of the bits string
+ * Output:		padded string
+/*----------------------------------------------------------------------------*/
 char *padBinary(char *binary, int length)
 {
     int i;
@@ -520,6 +537,12 @@ char *padBinary(char *binary, int length)
     return paddedBinary;
 }
 
+/*----------------------------------------------------------------------------*/
+/*
+ * Description: translate 4 bits to hex digit
+ * Input:       4 bits as string
+ * Output:		nothing
+/*----------------------------------------------------------------------------*/
 char valueOf(char *halfByte)
 {
     if(strcmp(halfByte, "0000") == 0)
@@ -557,7 +580,13 @@ char valueOf(char *halfByte)
     return 0;
 }
 
-char * littleEn (char * binary,int length ){
+/*----------------------------------------------------------------------------*/
+/*
+ * Description: prints the hex number as little endian format
+ * Input:       bits string, length of the bits string
+ * Output:		nothing
+/*----------------------------------------------------------------------------*/
+char * littleEn (char * binary,int length){
     int i;
     char *hex;
     char *paddedBinary = padBinary(binary, length);

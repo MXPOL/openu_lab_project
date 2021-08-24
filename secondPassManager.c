@@ -34,7 +34,7 @@ void secondPassManager( Data * data, FILE *file){
 /*
  * Description: handles the line input during the second pass
  * Input:       Data struct, file pointer
- * Output:		1 if sucessful, 0 otherwise
+ * Output:		1 if successful, 0 otherwise
  */
 /*----------------------------------------------------------------------------*/
 int lineHandlerSecondPass(Data * data, FILE * file){

@@ -48,6 +48,7 @@ char* getCharPtrBeyondSpace(char* pString);
 int isEndOfLine(char* pStr);
 void getTagOperand(Data * data, char * tagGet);
 void deleteSpaces (char* input);
+void removeSpaceFromEnd(char *str);
 
 /* directivesManager function declarations */
 int directivesManager(Data * data, char * tag,int whatPass);

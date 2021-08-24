@@ -30,6 +30,7 @@ int getNOperands(Data *data, int count, char *operand1, char *operand2, char *op
         /* check there's a comma between the two operands */
 
         data->line += strlen(operand1);
+        removeSpaceFromEnd(operand1);
         eatSpace(data);
         deleteSpaces(operand1);
         if (count > 1) {
@@ -47,6 +48,7 @@ int getNOperands(Data *data, int count, char *operand1, char *operand2, char *op
                 return 0;
             }
 
+
             if (sscanf(data->line, "%30[^,\n]", operand2) == 0) {
                 printf("[Error] on line %d: second operand required\n", data->lc);
                 data->containError = TRUE;
@@ -54,6 +56,7 @@ int getNOperands(Data *data, int count, char *operand1, char *operand2, char *op
             }
             /* check there's a comma between the two operands */
             data->line += strlen(operand2);
+            removeSpaceFromEnd(operand2);
             eatSpace(data);
             deleteSpaces(operand2);
 
@@ -72,6 +75,7 @@ int getNOperands(Data *data, int count, char *operand1, char *operand2, char *op
                 }
                 eatSpace(data);
                 data->line += strlen(operand3) + 1;
+                removeSpaceFromEnd(operand3);
                 deleteSpaces(operand3);
                 /* add a terminating character to the operand string */
             }
